@@ -17,15 +17,12 @@ public class Board {
         }
     }
 
-    public List<Tile> getBoard() {
-        ArrayList<Tile> board = new ArrayList<>();
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            for (int j = 0; j < BOARD_SIZE; j++) {
-                Tile aTile = new Tile(getTile(i, j));
-                board.add(aTile);
-            }
+    public List<Integer> getBoardValues() {
+        List<Integer> boardValues = new ArrayList<>();
+        for (Tile tile : aBoard) {
+            boardValues.add(tile.getValue());
         }
-        return Collections.unmodifiableList(board);
+        return Collections.unmodifiableList(boardValues);
     }
 
     public Tile getTile(int x, int y) {
@@ -36,67 +33,128 @@ public class Board {
         aBoard.set(x * BOARD_SIZE + y, tile);
     }
 
+    public void resetMergedState() {
+        for (Tile tile : aBoard) {
+            tile.setMerged(false);
+        }
+    }
+
     public void moveLeft() {
         for (int i = 0; i < BOARD_SIZE; i++) {
-            for (int j = 1; j < BOARD_SIZE; j++) {
-                if (getTile(i, j).getValue() != 0) {
-                    if (getTile(i, j - 1).getValue() == 0) {
-                        getTile(i, j - 1).setValue(getTile(i, j).getValue());
-                        getTile(i, j).setValue(0);
-                    } else if (getTile(i, j - 1).getValue() == getTile(i, j).getValue()) {
-                        getTile(i, j - 1).setMerged(true);
-                        getTile(i, j).setValue(0);
-                    }
-                }
-            }
+            slide(i, true, true);
         }
+
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            merge(i, true, true);
+        }
+
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            slide(i, true, true);
+        }
+
+        resetMergedState();
     }
 
     public void moveRight() {
         for (int i = 0; i < BOARD_SIZE; i++) {
-            for (int j = BOARD_SIZE - 2; j >= 0; j--) {
-                if (getTile(i, j).getValue() != 0) {
-                    if (getTile(i, j + 1).getValue() == 0) {
-                        getTile(i, j + 1).setValue(getTile(i, j).getValue());
-                        getTile(i, j).setValue(0);
-                    } else if (getTile(i, j + 1).getValue() == getTile(i, j).getValue()) {
-                        getTile(i, j + 1).setMerged(true);
-                        getTile(i, j).setValue(0);
-                    }
-                }
-            }
+            slide(i, true, false);
         }
+
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            merge(i, true, false);
+        }
+
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            slide(i, true, false);
+        }
+
+        resetMergedState();
     }
 
     public void moveUp() {
-        for (int i = 1; i < BOARD_SIZE; i++) {
-            for (int j = 0; j < BOARD_SIZE; j++) {
-                if (getTile(i, j).getValue() != 0) {
-                    if (getTile(i - 1, j).getValue() == 0) {
-                        getTile(i - 1, j).setValue(getTile(i, j).getValue());
-                        getTile(i, j).setValue(0);
-                    } else if (getTile(i - 1, j).getValue() == getTile(i, j).getValue()) {
-                        getTile(i - 1, j).setMerged(true);
-                        getTile(i, j).setValue(0);
-                    }
-                }
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            slide(i, false, true);
+        }
+
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            merge(i, false, true);
+        }
+
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            slide(i, false, true);
+        }
+
+        resetMergedState();
+    }
+
+    public void moveDown() {
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            slide(i, false, false);
+        }
+
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            merge(i, false, false);
+        }
+
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            slide(i, false, false);
+        }
+
+        resetMergedState();
+    }
+
+    private void slide(int start, boolean isRow, boolean isLeftOrUp) {
+        int[] newline = new int[BOARD_SIZE];
+        int newIndex = isLeftOrUp ? 0 : BOARD_SIZE - 1;
+
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            int idx = isRow ? start * BOARD_SIZE + i : i * BOARD_SIZE + start;
+            Tile tile = getTile(idx / BOARD_SIZE, idx % BOARD_SIZE);
+
+            if (tile.getValue() != 0) {
+                newline[newIndex] = tile.getValue();
+                tile.setValue(0);
+                newIndex = isLeftOrUp ? newIndex + 1 : newIndex - 1;
+            }
+        }
+
+        // Place the non-zero tiles back into the row or column
+        for (int i = 0; i < newline.length; i++) {
+            if (newline[i] != 0) {
+                Tile tile = getTile(isRow ? start : i, isRow ? i : start);
+                tile.setValue(newline[i]);
             }
         }
     }
 
-    public void moveDown() {
-        for (int i = BOARD_SIZE - 2; i >= 0; i--) {
-            for (int j = 0; j < BOARD_SIZE; j++) {
-                if (getTile(i, j).getValue() != 0) {
-                    if (getTile(i + 1, j).getValue() == 0) {
-                        getTile(i + 1, j).setValue(getTile(i, j).getValue());
-                        getTile(i, j).setValue(0);
-                    } else if (getTile(i + 1, j).getValue() == getTile(i, j).getValue()) {
-                        getTile(i + 1, j).setMerged(true);
-                        getTile(i, j).setValue(0);
-                    }
-                }
+    // Merge tiles in any direction (left/right/up/down) on a row or column.
+    private void merge(int start, boolean isRow, boolean isLeftOrUp) {
+        for (int i = isLeftOrUp ? 0 : BOARD_SIZE - 2; isLeftOrUp ? i < BOARD_SIZE - 1
+                : i >= 0; i = isLeftOrUp ? i + 1 : i - 1) {
+            int idx = isRow ? start * BOARD_SIZE + i : i * BOARD_SIZE + start;
+            Tile currentTile = getTile(idx / BOARD_SIZE, idx % BOARD_SIZE);
+            Tile nextTile = getTile(idx / BOARD_SIZE, (idx + 1) % BOARD_SIZE);
+
+            if (currentTile.getValue() == nextTile.getValue() && !currentTile.isMerged() && !nextTile.isMerged()) {
+                currentTile.setValue(currentTile.getValue() * 2); // Merge the tiles by doubling
+                currentTile.setMerged(true);
+                nextTile.setValue(0); // Set the next tile to 0 after merging
             }
         }
+    }
+
+    public boolean isGameOver() {
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                Tile tile = getTile(i, j);
+                if (tile.getValue() == 0)
+                    return false; // Empty tile exists
+                if (j < BOARD_SIZE - 1 && tile.getValue() == getTile(i, j + 1).getValue())
+                    return false; // Merge possible horizontally
+                if (i < BOARD_SIZE - 1 && tile.getValue() == getTile(i + 1, j).getValue())
+                    return false; // Merge possible vertically
+            }
+        }
+        return true; // No moves available
     }
 }
