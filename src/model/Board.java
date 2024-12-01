@@ -92,11 +92,16 @@ public class Board {
         resetMergedState();
     }
 
+    /**
+     * Merges adjacent tiles in the specified direction.
+     * @param start index of the starting row or column
+     * @param direction direction to merge in
+     */
     private void merge(int start, Directions direction) {
         boolean isForward = direction.isForward();
         boolean isRow = direction.isRow();
 
-        int increment = isForward ? 1 : -1;
+        int increment = isForward ? -1 : 1;
         int startIdx = isForward ? 0 : BOARD_SIZE - 2;
         int endIdx = isForward ? BOARD_SIZE - 1 : -1;
 
