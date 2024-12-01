@@ -12,12 +12,7 @@ public class Board {
 
     public Board() {
         this.random = new Random();
-        aBoard = new ArrayList<>();
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            for (int j = 0; j < BOARD_SIZE; j++) {
-                aBoard.add(new Tile());
-            }
-        }
+        initializeBoard();
     }
 
     public Board(Random random) {
@@ -69,74 +64,41 @@ public class Board {
     }
 
     public void moveLeft() {
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            slide(i, true, true);
-        }
-
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            merge(i, true, true);
-        }
-
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            slide(i, true, true);
-        }
-
-        resetMergedState();
+        move(Directions.LEFT);
     }
 
     public void moveRight() {
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            slide(i, true, false);
-        }
-
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            merge(i, true, false);
-        }
-
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            slide(i, true, false);
-        }
-
-        resetMergedState();
+        move(Directions.RIGHT);
     }
 
     public void moveUp() {
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            slide(i, false, true);
-        }
-
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            merge(i, false, true);
-        }
-
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            slide(i, false, true);
-        }
-
-        resetMergedState();
+        move(Directions.UP);
     }
 
     public void moveDown() {
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            slide(i, false, false);
-        }
+        move(Directions.DOWN);
+    }
 
+    private void move(Directions direction) {
         for (int i = 0; i < BOARD_SIZE; i++) {
-            merge(i, false, false);
+            slide(i, direction);
         }
-
         for (int i = 0; i < BOARD_SIZE; i++) {
-            slide(i, false, false);
+            merge(i, direction);
         }
-
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            slide(i, direction);
+        }
         resetMergedState();
     }
 
-    // Merge tiles in any direction (left/right/up/down) on a row or column.
-    private void merge(int start, boolean isRow, boolean isLeftOrUp) {
-        int increment = isLeftOrUp ? 1 : -1;
-        int startIdx = isLeftOrUp ? 0 : BOARD_SIZE - 2;
-        int endIdx = isLeftOrUp ? BOARD_SIZE - 1 : -1;
+    private void merge(int start, Directions direction) {
+        boolean isForward = direction.isForward();
+        boolean isRow = direction.isRow();
+
+        int increment = isForward ? 1 : -1;
+        int startIdx = isForward ? 0 : BOARD_SIZE - 2;
+        int endIdx = isForward ? BOARD_SIZE - 1 : -1;
 
         for (int i = startIdx; i != endIdx; i += increment) {
             Tile currentTile = getTileByIndex(start, i, isRow);
@@ -167,11 +129,13 @@ public class Board {
         nextTile.setValue(0);
     }
 
-    private void slide(int start, boolean isRow, boolean isLeftOrUp) {
-        int[] newline = new int[BOARD_SIZE];
-        int newIndex = isLeftOrUp ? 0 : BOARD_SIZE - 1;
+    private void slide(int start, Directions direction) {
+        boolean isForward = direction.isForward();
+        boolean isRow = direction.isRow();
 
-        // Extracted method to calculate index
+        int[] newline = new int[BOARD_SIZE];
+        int newIndex = isForward ? 0 : BOARD_SIZE - 1;
+
         for (int i = 0; i < BOARD_SIZE; i++) {
             int idx = calculateIndex(start, i, isRow);
             Tile tile = getTile(idx / BOARD_SIZE, idx % BOARD_SIZE);
@@ -179,11 +143,9 @@ public class Board {
             if (tile.getValue() != 0) {
                 newline[newIndex] = tile.getValue();
                 tile.setValue(0);
-                newIndex = updateNewIndex(newIndex, isLeftOrUp);
+                newIndex = updateNewIndex(newIndex, isForward);
             }
         }
-
-        // Extracted method to update board with new values
         updateBoardWithNewValues(newline, start, isRow);
     }
 
