@@ -1,10 +1,10 @@
 package model;
 
 public enum Directions {
-    UP(true, true),
-    DOWN(false, false),
-    LEFT(true, true),
-    RIGHT(false, false);
+    UP(true, false), // Forward (negative index) movement on columns
+    DOWN(false, false), // Backward (positive index) movement on columns
+    LEFT(true, true), // Forward (negative index) movement on rows
+    RIGHT(false, true); // Backward (positive index) movement on rows
 
     private final boolean isForward; // TRUE for UP/LEFT, FALSE for DOWN/RIGHT
     private final boolean isRow; // TRUE for horizontal movement (LEFT/RIGHT)
