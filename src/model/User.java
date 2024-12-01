@@ -1,15 +1,13 @@
 package model;
 
 public class User {
-    private final int id;
     private final String username;
     private final String hashedPassword;
     private final String email;
     private final String name;
     private int highestScore;
 
-    public User(int id, String username, String password, String email, String name, int highestScore) {
-        this.id = id;
+    public User(String username, String password, String email, String name, int highestScore) {
         this.username = username;
         this.hashedPassword = hashPass(password);
         this.email = email;
@@ -19,10 +17,6 @@ public class User {
 
     private String hashPass(String password) {
         return Integer.toHexString(password.hashCode());
-    }
-
-    public int getId() {
-        return id;
     }
 
     public String getUsername() {
