@@ -105,12 +105,15 @@ public class Board {
         int startIdx = isForward ? 0 : BOARD_SIZE - 2;
         int endIdx = isForward ? BOARD_SIZE - 1 : -1;
 
-        for (int i = startIdx; i != endIdx; i += increment) {
+        int i = startIdx;
+        while (i != endIdx) {
             Tile currentTile = getTileByIndex(start, i, isRow);
             Tile nextTile = getTileByIndex(start, i + increment, isRow);
 
             if (shouldMerge(currentTile, nextTile)) {
                 performMerge(currentTile, nextTile);
+            } else {
+                i += increment;
             }
         }
     }
