@@ -37,6 +37,10 @@ public class Board {
         return Collections.unmodifiableList(boardValues);
     }
 
+    private Tile getThisTile(int x, int y) {
+        return this.aBoard.get(x * BOARD_SIZE + y);
+    }
+
     public Tile getTile(int x, int y) {
         return new Tile(aBoard.get(x * BOARD_SIZE + y));
     }
@@ -250,7 +254,7 @@ public class Board {
     private void updateRowWithNewValues(int[] newline, int row) {
         for (int i = 0; i < newline.length; i++) {
             if (newline[i] != 0) {
-                Tile tile = getTile(row, i);
+                Tile tile = getThisTile(row, i);
                 tile.setValue(newline[i]);
             }
         }
@@ -259,7 +263,7 @@ public class Board {
     private void updateColumnWithNewValues(int[] newline, int col) {
         for (int i = 0; i < newline.length; i++) {
             if (newline[i] != 0) {
-                Tile tile = getTile(i, col);
+                Tile tile = getThisTile(i, col);
                 tile.setValue(newline[i]);
             }
         }

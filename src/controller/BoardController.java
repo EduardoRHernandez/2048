@@ -16,19 +16,19 @@ public class BoardController {
     }
 
     public void moveUp() {
-        board.moveUp();
+        board.move(Directions.UP);
     }
 
     public void moveDown() {
-        board.moveDown();
+        board.move(Directions.DOWN);
     }
 
     public void moveLeft() {
-        board.moveLeft();
+        board.move(Directions.LEFT);
     }
 
     public void moveRight() {
-        board.moveRight();
+        board.move(Directions.RIGHT);
     }
 
     public List<Integer> getBoard() {
