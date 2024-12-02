@@ -38,27 +38,31 @@ public class Board {
     }
 
     public Tile getTile(int x, int y) {
-        return aBoard.get(x * BOARD_SIZE + y);
+        return new Tile(aBoard.get(x * BOARD_SIZE + y));
     }
 
     public void setTile(int x, int y, Tile tile) {
-        aBoard.set(x * BOARD_SIZE + y, tile);
+        aBoard.set(x * BOARD_SIZE + y, new Tile(tile));
     }
 
-    public void resetMergedState() {
+    private void resetMergedState() {
         for (Tile tile : aBoard) {
             tile.setMerged(false);
         }
     }
 
     public List<Tile> getRow(int rowIndex) {
-        return aBoard.subList(rowIndex * BOARD_SIZE, (rowIndex + 1) * BOARD_SIZE);
+        List<Tile> row = new ArrayList<>();
+        for (Tile tile : aBoard.subList(rowIndex * BOARD_SIZE, (rowIndex + 1) * BOARD_SIZE)) {
+            row.add(new Tile(tile));
+        }
+        return row;
     }
 
     public List<Tile> getColumn(int colIndex) {
         List<Tile> column = new ArrayList<>();
         for (int i = 0; i < BOARD_SIZE; i++) {
-            column.add(aBoard.get(i * BOARD_SIZE + colIndex));
+            column.add(new Tile(aBoard.get(i * BOARD_SIZE + colIndex)));
         }
         return column;
     }
@@ -103,7 +107,7 @@ public class Board {
         boolean isRow = direction.isRow();
 
         int increment = isForward ? 1 : -1;
-        int startIdx = isForward ? 0 : BOARD_SIZE - 2;
+        int startIdx = isForward ? 0 : BOARD_SIZE - 1;
         int endIdx = isForward ? BOARD_SIZE - 1 : -1;
 
         int i = startIdx;
@@ -143,7 +147,7 @@ public class Board {
         boolean isRow = direction.isRow();
 
         int[] newline = new int[BOARD_SIZE];
-        int newIndex = isForward ? 0 : BOARD_SIZE - 1;
+        int newIndex = isForward ? BOARD_SIZE - 1 : 0; // Start at the rightmost position
 
         for (int i = 0; i < BOARD_SIZE; i++) {
             int idx = calculateIndex(start, i, isRow);

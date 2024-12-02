@@ -13,17 +13,39 @@ public class UserFileHandler {
 
     // Save users to file
     public static void saveUsersToFile(List<User> users, String filename) throws IOException {
+        // Open the file for writing
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+            // Iterate over each user and serialize their data into a single line
             for (User user : users) {
-                // Serialize user attributes into a single line
-                writer.write(user.getUsername() + "," +
-                        escapeComma(user.getEmail()) + "," +
-                        escapeComma(user.getName()) + "," +
-                        user.getHighestScore() + "," +
-                        user.isPasswordCorrect("")); // Save hashed password
+                String userLine = serializeUser(user);
+                writer.write(userLine);
                 writer.newLine();
             }
         }
+    }
+
+    public static void saveUsersToFile(User user, String filename) throws IOException {
+        // Open the file for writing
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename, true))) {
+            // If the file is not empty, write a new line before adding the next user
+            if (new File(filename).length() > 0) {
+                writer.newLine();
+            }
+
+            // Serialize the single user and write to file
+            String userLine = serializeUser(user);
+            writer.write(userLine);
+        }
+    }
+
+    // Helper method to serialize a user into a CSV-friendly format
+    private static String serializeUser(User user) {
+        // Escape special characters like commas in user attributes
+        return user.getUsername() + "," +
+                escapeComma(user.getEmail()) + "," +
+                escapeComma(user.getName()) + "," +
+                user.getHighestScore() + "," +
+                user.isPasswordCorrect(""); // Save hashed password
     }
 
     public static List<User> loadUsersFromFile(String filename) throws IOException {
@@ -50,6 +72,46 @@ public class UserFileHandler {
             }
         }
         return users;
+    }
+
+    public static void printUsers(List<User> users) {
+        for (User user : users) {
+            if (user != null) {
+                LOGGER.info(user.toString());
+            }
+        }
+    }
+
+    public static void printUser(User user) {
+        if (user != null) {
+            LOGGER.info(user.toString());
+        }
+    }
+
+    public static User getUser(String username, String password, String filename) throws IOException {
+        List<User> users = loadUsersFromFile(filename);
+        for (User user : users) {
+            if (user.getUsername().equals(username) && user.isPasswordCorrect(password)) {
+                return user;
+            }
+        }
+        return null;
+    }
+
+    public static User getUser(String username, String name, String email, String filename) throws IOException {
+        List<User> users = loadUsersFromFile(filename);
+        for (User user : users) {
+            if (user.getUsername().equals(username) && user.getName().equals(name) && user.getEmail().equals(email)) {
+                return user;
+            }
+        }
+        return null;
+    }
+
+    public static void deleteUser(String username, String filename) throws IOException {
+        List<User> users = loadUsersFromFile(filename);
+        users.removeIf(user -> user.getUsername().equals(username));
+        saveUsersToFile(users, filename);
     }
 
     // Utility methods to handle special characters in data

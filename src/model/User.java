@@ -2,7 +2,7 @@ package model;
 
 public class User {
     private final String username;
-    private final String hashedPassword;
+    private String hashedPassword;
     private final String email;
     private final String name;
     private int highestScore;
@@ -27,10 +27,6 @@ public class User {
         return hashedPassword.equals(hashPass(password));
     }
 
-    public String getPassword() {
-        return hashedPassword;
-    }
-
     public String getEmail() {
         return email;
     }
@@ -47,5 +43,19 @@ public class User {
         if (highestScore > this.highestScore) {
             this.highestScore = highestScore;
         }
+    }
+
+    public void resetPassword(String newPassword) {
+        this.hashedPassword = hashPass(newPassword);
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", name='" + name + '\'' +
+                ", highestScore=" + highestScore +
+                '}';
     }
 }
