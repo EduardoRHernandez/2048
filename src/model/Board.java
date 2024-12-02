@@ -107,7 +107,7 @@ public class Board {
         boolean isRow = direction.isRow();
 
         int increment = isForward ? 1 : -1;
-        int startIdx = isForward ? 0 : BOARD_SIZE - 1;
+        int startIdx = isForward ? 0 : BOARD_SIZE - 2;
         int endIdx = isForward ? BOARD_SIZE - 1 : -1;
 
         int i = startIdx;
@@ -147,7 +147,7 @@ public class Board {
         boolean isRow = direction.isRow();
 
         int[] newline = new int[BOARD_SIZE];
-        int newIndex = isForward ? BOARD_SIZE - 1 : 0; // Start at the rightmost position
+        int newIndex = isForward ? 0 : BOARD_SIZE - 1;
 
         for (int i = 0; i < BOARD_SIZE; i++) {
             int idx = calculateIndex(start, i, isRow);
