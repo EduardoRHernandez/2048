@@ -55,7 +55,7 @@ public class BoardTest {
 
         board.setTile(0, 0, tile1);
         board.setTile(0, 1, tile2);
-        board.moveLeft();
+        board.move(Directions.LEFT);
 
         assertEquals(4, board.getTile(0, 0).getValue(), "Tile at (0, 0) should have value 4 after merge.");
         assertEquals(0, board.getTile(0, 1).getValue(), "Tile at (0, 1) should be empty after merge.");
@@ -68,12 +68,23 @@ public class BoardTest {
         tile1.setValue(2);
         Tile tile2 = new Tile();
         tile2.setValue(2);
+        Tile tile3 = new Tile();
+        tile3.setValue(2);
+        Tile tile4 = new Tile();
+        tile4.setValue(2);
+        Tile tile5 = new Tile();
+        tile5.setValue(2);
+        Tile tile6 = new Tile();
+        tile6.setValue(2);
 
-        board.setTile(0, 2, tile1);
+        board.setTile(0, 1, tile1);
         board.setTile(0, 3, tile2);
-        board.moveRight();
+        board.setTile(1, 1, tile3);
+        board.setTile(2, 0, tile4);
+        board.setTile(3, 1, tile5);
+        board.setTile(3, 3, tile6);
+        board.move(Directions.RIGHT);
 
-        System.out.println(board.toString());
         assertEquals(4, board.getTile(0, 3).getValue(), "Tile at (0, 3) should have value 4 after merge.");
         assertEquals(0, board.getTile(0, 2).getValue(), "Tile at (0, 2) should be empty after merge.");
     }
@@ -85,12 +96,12 @@ public class BoardTest {
     	Tile tile2 = new Tile();
     	tile2.setValue(2);
     	
-    	board.setTile(0, 0, tile1);
-    	board.setTile(0, 1, tile2);
-    	board.moveUp();
+    	board.setTile(0, 2, tile1);
+    	board.setTile(1, 2, tile2);
+    	board.move(Directions.UP);
     	
-    	assertEquals(4, board.getTile(0,0).getValue());
-    	assertEquals(0, board.getTile(0, 1).getValue());
+    	assertEquals(4, board.getTile(0,2).getValue());
+    	assertEquals(0, board.getTile(1, 2).getValue());
     }
     
     @Test 
@@ -101,11 +112,11 @@ public class BoardTest {
     	tile2.setValue(2);
     	
     	board.setTile(0, 2, tile1);
-    	board.setTile(0, 3, tile2);
-    	board.moveDown();
+    	board.setTile(1, 2, tile2);
+    	board.move(Directions.DOWN);
     	
-    	assertEquals(4, board.getTile(0,3).getValue());
-    	assertEquals(0, board.getTile(0, 2).getValue());
+    	assertEquals(4, board.getTile(3,2).getValue());
+    	assertEquals(0, board.getTile(1, 2).getValue());
     }
 
     @Test
