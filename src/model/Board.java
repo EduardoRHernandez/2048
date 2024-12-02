@@ -177,7 +177,7 @@ public class Board {
         int newIndex = 0;
 
         for (int i = 0; i < BOARD_SIZE; i++) {
-            Tile tile = getTile(i, col);
+            Tile tile = getThisTile(i, col);
             if (tile.getValue() != 0) {
                 newline[newIndex] = tile.getValue();
                 tile.setValue(0);
@@ -192,7 +192,7 @@ public class Board {
         int newIndex = BOARD_SIZE - 1;
 
         for (int i = BOARD_SIZE - 1; i >= 0; i--) {
-            Tile tile = getTile(i, col);
+            Tile tile = getThisTile(i, col);
             if (tile.getValue() != 0) {
                 newline[newIndex] = tile.getValue();
                 tile.setValue(0);
@@ -306,12 +306,12 @@ public class Board {
     public boolean isGameOver() {
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
-                Tile tile = getTile(i, j);
+                Tile tile = getThisTile(i, j);
                 if (tile.getValue() == 0)
                     return false; // Empty tile exists
-                if (j < BOARD_SIZE - 1 && tile.getValue() == getTile(i, j + 1).getValue())
+                if (j < BOARD_SIZE - 1 && tile.getValue() == getThisTile(i, j + 1).getValue())
                     return false; // Merge possible horizontally
-                if (i < BOARD_SIZE - 1 && tile.getValue() == getTile(i + 1, j).getValue())
+                if (i < BOARD_SIZE - 1 && tile.getValue() == getThisTile(i + 1, j).getValue())
                     return false; // Merge possible vertically
             }
         }
@@ -323,7 +323,7 @@ public class Board {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
-                sb.append(getTile(i, j).getValue()).append("\t");
+                sb.append(getThisTile(i, j).getValue()).append("\t");
             }
             sb.append("\n");
         }
