@@ -205,8 +205,8 @@ public class Board {
     // Merging methods
     private void mergeLeft(int row) {
         for (int i = 0; i < BOARD_SIZE - 1; i++) {
-            Tile currentTile = getTile(row, i);
-            Tile nextTile = getTile(row, i + 1);
+            Tile currentTile = getThisTile(row, i);
+            Tile nextTile = getThisTile(row, i + 1);
 
             if (shouldMerge(currentTile, nextTile)) {
                 performMerge(currentTile, nextTile);
@@ -217,8 +217,8 @@ public class Board {
 
     private void mergeRight(int row) {
         for (int i = BOARD_SIZE - 1; i > 0; i--) {
-            Tile currentTile = getTile(row, i);
-            Tile nextTile = getTile(row, i - 1);
+            Tile currentTile = getThisTile(row, i);
+            Tile nextTile = getThisTile(row, i - 1);
 
             if (shouldMerge(currentTile, nextTile)) {
                 performMerge(currentTile, nextTile);
@@ -229,8 +229,8 @@ public class Board {
 
     private void mergeUp(int col) {
         for (int i = 0; i < BOARD_SIZE - 1; i++) {
-            Tile currentTile = getTile(i, col);
-            Tile nextTile = getTile(i + 1, col);
+            Tile currentTile = getThisTile(i, col);
+            Tile nextTile = getThisTile(i + 1, col);
 
             if (shouldMerge(currentTile, nextTile)) {
                 performMerge(currentTile, nextTile);
@@ -241,8 +241,8 @@ public class Board {
 
     private void mergeDown(int col) {
         for (int i = BOARD_SIZE - 1; i > 0; i--) {
-            Tile currentTile = getTile(i, col);
-            Tile nextTile = getTile(i - 1, col);
+            Tile currentTile = getThisTile(i, col);
+            Tile nextTile = getThisTile(i - 1, col);
 
             if (shouldMerge(currentTile, nextTile)) {
                 performMerge(currentTile, nextTile);
