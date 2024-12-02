@@ -45,7 +45,7 @@ public class Board {
         aBoard.set(x * BOARD_SIZE + y, new Tile(tile));
     }
 
-    private void resetMergedState() {
+    void resetMergedState() {
         for (Tile tile : aBoard) {
             tile.setMerged(false);
         }
@@ -67,65 +67,202 @@ public class Board {
         return column;
     }
 
-    public void moveLeft() {
-        move(Directions.LEFT);
+    public void move(Directions direction) {
+        switch (direction) {
+            case UP:
+                moveUp();
+                break;
+            case DOWN:
+                moveDown();
+                break;
+            case LEFT:
+                moveLeft();
+                break;
+            case RIGHT:
+                moveRight();
+                break;
+        }
     }
 
-    public void moveRight() {
-        move(Directions.RIGHT);
-    }
-
-    public void moveUp() {
-        move(Directions.UP);
-    }
-
-    public void moveDown() {
-        move(Directions.DOWN);
-    }
-
-    private void move(Directions direction) {
+    private void moveLeft() {
         for (int i = 0; i < BOARD_SIZE; i++) {
-            slide(i, direction);
+            slideLeft(i);
         }
         for (int i = 0; i < BOARD_SIZE; i++) {
-            merge(i, direction);
+            mergeLeft(i);
         }
         for (int i = 0; i < BOARD_SIZE; i++) {
-            slide(i, direction);
+            slideLeft(i);
         }
         resetMergedState();
     }
 
-    /**
-     * Merges adjacent tiles in the specified direction.
-     * 
-     * @param start     index of the starting row or column
-     * @param direction direction to merge in
-     */
-    private void merge(int start, Directions direction) {
-        boolean isForward = direction.isForward();
-        boolean isRow = direction.isRow();
+    private void moveRight() {
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            slideRight(i);
+        }
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            mergeRight(i);
+        }
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            slideRight(i);
+        }
+        resetMergedState();
+    }
 
-        int increment = isForward ? 1 : -1;
-        int startIdx = isForward ? 0 : BOARD_SIZE - 2;
-        int endIdx = isForward ? BOARD_SIZE - 1 : -1;
+    private void moveUp() {
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            slideUp(i);
+        }
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            mergeUp(i);
+        }
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            slideUp(i);
+        }
+        resetMergedState();
+    }
 
-        int i = startIdx;
-        while (i != endIdx) {
-            Tile currentTile = getTileByIndex(start, i, isRow);
-            Tile nextTile = getTileByIndex(start, i + increment, isRow);
+    private void moveDown() {
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            slideDown(i);
+        }
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            mergeDown(i);
+        }
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            slideDown(i);
+        }
+        resetMergedState();
+    }
+
+    // Sliding methods
+    private void slideLeft(int row) {
+        int[] newline = new int[BOARD_SIZE];
+        int newIndex = 0;
+
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            Tile tile = getTile(row, i);
+            if (tile.getValue() != 0) {
+                newline[newIndex] = tile.getValue();
+                tile.setValue(0);
+                newIndex++;
+            }
+        }
+        updateRowWithNewValues(newline, row);
+    }
+
+    private void slideRight(int row) {
+        int[] newline = new int[BOARD_SIZE];
+        int newIndex = BOARD_SIZE - 1;
+
+        for (int i = BOARD_SIZE - 1; i >= 0; i--) {
+            Tile tile = getTile(row, i);
+            if (tile.getValue() != 0) {
+                newline[newIndex] = tile.getValue();
+                tile.setValue(0);
+                newIndex--;
+            }
+        }
+        updateRowWithNewValues(newline, row);
+    }
+
+    private void slideUp(int col) {
+        int[] newline = new int[BOARD_SIZE];
+        int newIndex = 0;
+
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            Tile tile = getTile(i, col);
+            if (tile.getValue() != 0) {
+                newline[newIndex] = tile.getValue();
+                tile.setValue(0);
+                newIndex++;
+            }
+        }
+        updateColumnWithNewValues(newline, col);
+    }
+
+    private void slideDown(int col) {
+        int[] newline = new int[BOARD_SIZE];
+        int newIndex = BOARD_SIZE - 1;
+
+        for (int i = BOARD_SIZE - 1; i >= 0; i--) {
+            Tile tile = getTile(i, col);
+            if (tile.getValue() != 0) {
+                newline[newIndex] = tile.getValue();
+                tile.setValue(0);
+                newIndex--;
+            }
+        }
+        updateColumnWithNewValues(newline, col);
+    }
+
+    // Merging methods
+    private void mergeLeft(int row) {
+        for (int i = 0; i < BOARD_SIZE - 1; i++) {
+            Tile currentTile = getTile(row, i);
+            Tile nextTile = getTile(row, i + 1);
 
             if (shouldMerge(currentTile, nextTile)) {
                 performMerge(currentTile, nextTile);
-            } else {
-                i += increment;
+                i++; // Skip next tile after merge
             }
         }
     }
 
-    // Extracted helper method to calculate tile indices
-    private Tile getTileByIndex(int start, int index, boolean isRow) {
-        return isRow ? getTile(start, index) : getTile(index, start);
+    private void mergeRight(int row) {
+        for (int i = BOARD_SIZE - 1; i > 0; i--) {
+            Tile currentTile = getTile(row, i);
+            Tile nextTile = getTile(row, i - 1);
+
+            if (shouldMerge(currentTile, nextTile)) {
+                performMerge(currentTile, nextTile);
+                i--; // Skip next tile after merge
+            }
+        }
+    }
+
+    private void mergeUp(int col) {
+        for (int i = 0; i < BOARD_SIZE - 1; i++) {
+            Tile currentTile = getTile(i, col);
+            Tile nextTile = getTile(i + 1, col);
+
+            if (shouldMerge(currentTile, nextTile)) {
+                performMerge(currentTile, nextTile);
+                i++; // Skip next tile after merge
+            }
+        }
+    }
+
+    private void mergeDown(int col) {
+        for (int i = BOARD_SIZE - 1; i > 0; i--) {
+            Tile currentTile = getTile(i, col);
+            Tile nextTile = getTile(i - 1, col);
+
+            if (shouldMerge(currentTile, nextTile)) {
+                performMerge(currentTile, nextTile);
+                i--; // Skip next tile after merge
+            }
+        }
+    }
+
+    // Helper methods for updating board values
+    private void updateRowWithNewValues(int[] newline, int row) {
+        for (int i = 0; i < newline.length; i++) {
+            if (newline[i] != 0) {
+                Tile tile = getTile(row, i);
+                tile.setValue(newline[i]);
+            }
+        }
+    }
+
+    private void updateColumnWithNewValues(int[] newline, int col) {
+        for (int i = 0; i < newline.length; i++) {
+            if (newline[i] != 0) {
+                Tile tile = getTile(i, col);
+                tile.setValue(newline[i]);
+            }
+        }
     }
 
     // Extracted helper method to check merge conditions
@@ -140,46 +277,6 @@ public class Board {
         currentTile.setValue(currentTile.getValue() * 2);
         currentTile.setMerged(true);
         nextTile.setValue(0);
-    }
-
-    private void slide(int start, Directions direction) {
-        boolean isForward = direction.isForward();
-        boolean isRow = direction.isRow();
-
-        int[] newline = new int[BOARD_SIZE];
-        int newIndex = isForward ? 0 : BOARD_SIZE - 1;
-
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            int idx = calculateIndex(start, i, isRow);
-            Tile tile = getTile(idx / BOARD_SIZE, idx % BOARD_SIZE);
-
-            if (tile.getValue() != 0) {
-                newline[newIndex] = tile.getValue();
-                tile.setValue(0);
-                newIndex = updateNewIndex(newIndex, isForward);
-            }
-        }
-        updateBoardWithNewValues(newline, start, isRow);
-    }
-
-    // Helper method to calculate index
-    private int calculateIndex(int start, int i, boolean isRow) {
-        return isRow ? start * BOARD_SIZE + i : i * BOARD_SIZE + start;
-    }
-
-    // Helper method to update new index
-    private int updateNewIndex(int newIndex, boolean isLeftOrUp) {
-        return isLeftOrUp ? newIndex + 1 : newIndex - 1;
-    }
-
-    // Helper method to update board with new values
-    private void updateBoardWithNewValues(int[] newline, int start, boolean isRow) {
-        for (int i = 0; i < newline.length; i++) {
-            if (newline[i] != 0) {
-                Tile tile = getTile(isRow ? start : i, isRow ? i : start);
-                tile.setValue(newline[i]);
-            }
-        }
     }
 
     public void addRandomTile() {
