@@ -168,6 +168,7 @@ public class Board {
                 newIndex--;
             }
         }
+
         updateRowWithNewValues(newline, row);
     }
 
@@ -253,19 +254,15 @@ public class Board {
     // Helper methods for updating board values
     private void updateRowWithNewValues(int[] newline, int row) {
         for (int i = 0; i < newline.length; i++) {
-            if (newline[i] != 0) {
-                Tile tile = getThisTile(row, i);
-                tile.setValue(newline[i]);
-            }
+            Tile tile = getThisTile(row, i);
+            tile.setValue(newline[i]);
         }
     }
 
     private void updateColumnWithNewValues(int[] newline, int col) {
         for (int i = 0; i < newline.length; i++) {
-            if (newline[i] != 0) {
-                Tile tile = getThisTile(i, col);
-                tile.setValue(newline[i]);
-            }
+            Tile tile = getThisTile(i, col);
+            tile.setValue(newline[i]);
         }
     }
 
