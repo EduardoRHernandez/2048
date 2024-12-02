@@ -94,7 +94,8 @@ public class Board {
 
     /**
      * Merges adjacent tiles in the specified direction.
-     * @param start index of the starting row or column
+     * 
+     * @param start     index of the starting row or column
      * @param direction direction to merge in
      */
     private void merge(int start, Directions direction) {
