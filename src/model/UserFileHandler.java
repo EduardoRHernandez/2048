@@ -54,16 +54,16 @@ public class UserFileHandler {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",", -1); // Split by comma with all fields
-                if (parts.length == 6) {
+                if (parts.length == 5) {
                     try {
                         String username = unescapeComma(parts[0]);
                         String email = unescapeComma(parts[1]);
                         String name = unescapeComma(parts[2]);
                         int highestScore = Integer.parseInt(parts[3]);
-                        String passwordHash = parts[4]; // Prehashed password
+                        String passwordHash = parts[4]; // hashed password
 
                         // Recreate the user (pass password hash directly)
-                        User user = new User(username, passwordHash, email, name, highestScore);
+                        User user = new User(username, passwordHash, email, name, highestScore, true);
                         users.add(user);
                     } catch (NumberFormatException e) {
                         LOGGER.warning("Malformed data: " + line);

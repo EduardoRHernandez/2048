@@ -15,6 +15,17 @@ public class User {
         this.highestScore = highestScore;
     }
 
+    public User(String username, String hashedPassword, String email, String name, int highestScore, boolean isHashed) {
+        if (!isHashed) {
+            throw new IllegalArgumentException("Use the plain password constructor for non-hashed passwords.");
+        }
+        this.username = username;
+        this.hashedPassword = hashedPassword;
+        this.email = email;
+        this.name = name;
+        this.highestScore = highestScore;
+    }
+
     private String hashPass(String password) {
         return Integer.toHexString(password.hashCode());
     }
