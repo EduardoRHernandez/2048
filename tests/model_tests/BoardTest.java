@@ -253,4 +253,24 @@ public class BoardTest {
             assertEquals(0, column.get(i).getValue(), "Middle tiles should have value 0.");
         }
     }
+    
+    @Test
+    void testGameIsOverFullBoardWithMoves() {
+        int[][] values = {
+            {2, 4, 8, 16},
+            {32, 64, 128, 256},
+            {512, 1024, 2048, 4096},
+            {8192, 16384, 16384, 65536}
+        };
+
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                Tile tile = new Tile();
+                tile.setValue(values[i][j]);
+                board.setTile(i, j, tile);
+            }
+        }
+
+        assertFalse(board.isGameOver(), "Game should not be over if a merge is possible.");
+    }
 }
