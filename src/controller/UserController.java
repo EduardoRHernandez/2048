@@ -2,7 +2,6 @@ package controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import model.*;
@@ -17,9 +16,8 @@ public class UserController {
     public boolean addUser(String username, String password, String email, String name, int highestScore) {
         User newUser = new User(username, password, email, name, highestScore);
         try {
-        	// Load all users from the file
+            // Load all users from the file
             List<User> existingUsers = UserFileHandler.loadUsersFromFile(usersFile.getPath());
-            
             // Check for duplicates in username or email
             for (User user : existingUsers) {
                 if (user.getUsername().equalsIgnoreCase(username)) {
@@ -29,8 +27,8 @@ public class UserController {
                     return false;
                 }
             }
-        	
-            UserFileHandler.saveUsersToFile(newUser, usersFile.getPath());return true;
+            UserFileHandler.saveUsersToFile(newUser, usersFile.getPath());
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
             return false;
@@ -40,6 +38,15 @@ public class UserController {
     public User getUser(String username, String password) {
         try {
             return UserFileHandler.getUser(username, password, usersFile.getPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public User getUser(String username) {
+        try {
+            return UserFileHandler.getUser(username, usersFile.getPath());
         } catch (IOException e) {
             e.printStackTrace();
             return null;
