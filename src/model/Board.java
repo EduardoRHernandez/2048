@@ -21,10 +21,15 @@ public class Board {
         initializeBoard();
     }
 
+    /**
+     * Initialize the board with 4x4 empty tiles.
+     */
     private void initializeBoard() {
         aBoard = new ArrayList<>();
+        // Create 4x4 tiles
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
+                // Create a new tile and add it to the board
                 aBoard.add(new Tile());
             }
         }
@@ -173,7 +178,6 @@ public class Board {
                 newIndex--;
             }
         }
-
         updateRowWithNewValues(newline, row);
     }
 

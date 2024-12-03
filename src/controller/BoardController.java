@@ -19,12 +19,6 @@ public class BoardController {
         board.move(Directions.UP);
     }
 
-    /************* ✨ Codeium Command ⭐ *************/
-    /**
-     * Moves the tiles down (positive y direction) on the board, combining tiles
-     * of the same value.
-     */
-    /****** 6c842576-a108-4727-971f-4d85626c41b9 *******/
     public void moveDown() {
         board.move(Directions.DOWN);
     }
@@ -59,5 +53,9 @@ public class BoardController {
 
     public Tile getTile(int x, int y) {
         return board.getTile(x, y);
+    }
+
+    public boolean isGameOver() {
+        return board.isGameOver();
     }
 }
