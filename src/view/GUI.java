@@ -1,81 +1,130 @@
 package view;
 
 import controller.BoardController;
-import javafx.animation.TranslateTransition;
 import javafx.application.Application;
+import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
 public class GUI extends Application {
 
   private BoardController controller;
   private GridPane grid;
   private Label scoreLabel;
+  private Label bestScoreLabel;
   private int score;
+  private int bestScore;
 
   @Override
   public void start(Stage primaryStage) {
     // Initialize the game controller
     controller = new BoardController();
-    controller.addRandomTile(); // Add the first random tile
-    controller.addRandomTile(); // Add the second random tile
+    controller.addRandomTile();
+    controller.addRandomTile();
 
-    // Initialize the score using controller
+    // Initialize scores
     score = controller.getCurrentScore();
+    bestScore = 0;
 
     // Set up the score label
     scoreLabel = new Label("Score: " + score);
-    scoreLabel.setStyle(
-      "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #f9f6f2;"
+    scoreLabel.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+    scoreLabel.setStyle("-fx-text-fill: #f9f6f2;");
+
+    // Set up the best score label
+    bestScoreLabel = new Label("Best: " + bestScore);
+    bestScoreLabel.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+    bestScoreLabel.setStyle("-fx-text-fill: #f9f6f2;");
+
+    // Wrap score labels in StackPanes for background styling
+    StackPane scoreBox = new StackPane();
+    scoreBox.setStyle(
+      "-fx-background-color: #bbada0; -fx-padding: 10; -fx-border-radius: 5px;"
     );
+    scoreBox.getChildren().add(scoreLabel);
+    scoreBox.setPrefSize(150, 50); // Fix the size of the background box
+
+    StackPane bestScoreBox = new StackPane();
+    bestScoreBox.setStyle(
+      "-fx-background-color: #bbada0; -fx-padding: 10; -fx-border-radius: 5px;"
+    );
+    bestScoreBox.getChildren().add(bestScoreLabel);
+    bestScoreBox.setPrefSize(150, 50); // Fix the size of the background box
+
+    // Set up the "New Game" button
+    Button newGameButton = new Button("New Game");
+    newGameButton.setStyle(
+      "-fx-font-size: 16px; -fx-font-weight: bold; -fx-background-color: #8f7a66; -fx-text-fill: white; -fx-padding: 10 20;"
+    );
+    newGameButton.setOnAction(e -> restartGame());
+
+    // Arrange score, best score, and button in a horizontal box
+    HBox scoreBoxContainer = new HBox(
+      20,
+      scoreBox,
+      bestScoreBox,
+      newGameButton
+    );
+    scoreBoxContainer.setAlignment(Pos.CENTER);
 
     // Set up the game grid
     grid = new GridPane();
-    grid.setHgap(10); // Horizontal gap between tiles
-    grid.setVgap(10); // Vertical gap between tiles
-    grid.setStyle("-fx-background-color: #bbada0; -fx-padding: 10;");
+    grid.setHgap(10);
+    grid.setVgap(10);
+    grid.setPrefSize(400, 400); // Fix the size of the grid
+    grid.setStyle(
+      "-fx-background-color: #bbada0; -fx-padding: 20; -fx-border-radius: 10px;"
+    );
+    grid.setAlignment(Pos.CENTER); // Center-align the grid in its container
 
     // Display the initial board
     updateBoard();
 
-    // Combine the score label and game grid into a VBox layout
-    VBox root = new VBox(10, scoreLabel, grid);
+    // Combine scoreBoxContainer and grid into a VBox layout
+    VBox root = new VBox(20, scoreBoxContainer, grid);
     root.setStyle("-fx-background-color: #faf8ef; -fx-padding: 20;");
-    root.setAlignment(Pos.TOP_CENTER); // Align everything at the top center
+    root.setAlignment(Pos.TOP_CENTER);
 
-    // Create the scene and add a key press event handler
+    // Prevent grid stretching when fullscreen
+    VBox.setVgrow(grid, null);
+
+    // Create the scene
     Scene scene = new Scene(root, 500, 600);
+    root.requestFocus(); // Ensure the root has focus for key handling
+
+    // Add key press event handler
     scene.setOnKeyPressed(event -> {
       switch (event.getCode()) {
         case UP:
           controller.moveUp();
-          updateScore(); // Update the score after moving
           break;
         case DOWN:
           controller.moveDown();
-          updateScore();
           break;
         case LEFT:
           controller.moveLeft();
-          updateScore();
           break;
         case RIGHT:
           controller.moveRight();
-          updateScore();
           break;
         default:
-          return; // Ignore non-arrow keys
+          return; // Ignore other keys
       }
 
-      controller.addRandomTile(); // Add a random tile after each move
-      animateTiles(); // Animate the tile movement
-      updateBoard(); // Refresh the UI
+      // Update the game state
+      controller.addRandomTile();
+      updateScore();
+      updateBoard();
 
       // Check if the game is over
       if (controller.isGameOver()) {
@@ -90,20 +139,22 @@ public class GUI extends Application {
   }
 
   private void updateBoard() {
-    grid.getChildren().clear(); // Clear the grid for updates
-    var boardValues = controller.getBoard(); // Fetch board values
+    grid.getChildren().clear();
+    var boardValues = controller.getBoard();
 
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < 4; j++) {
         int value = boardValues.get(i * 4 + j);
 
-        // Create a label to represent each tile
+        // Create a label for each tile
         Label tile = new Label(value == 0 ? "" : String.valueOf(value));
-        tile.setMinSize(100, 100); // Set tile size
-        tile.setAlignment(Pos.CENTER); // Center the text
-        tile.setStyle(getTileStyle(value)); // Style the tile based on its value
+        tile.setMinSize(100, 100);
+        tile.setAlignment(Pos.CENTER);
+        tile.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+        tile.setStyle(getTileStyle(value));
 
-        grid.add(tile, j, i); // Add the tile to the grid at (column, row)
+        grid.add(tile, j, i);
+        GridPane.setHalignment(tile, HPos.CENTER);
       }
     }
   }
@@ -145,71 +196,43 @@ public class GUI extends Application {
         backgroundColor = "#edc22e";
         break;
       default:
-        backgroundColor = "#cdc1b4"; // Default for empty or unknown tiles
+        backgroundColor = "#cdc1b4";
     }
 
-    String fontColor = (value == 2 || value == 4) ? "#776e65" : "#f9f6f2"; // Text color
+    String fontColor = (value == 2 || value == 4) ? "#776e65" : "#f9f6f2";
     return String.format(
-      "-fx-background-color: %s; -fx-border-color: #bbada0; -fx-border-width: 2px; " +
-      "-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: %s; -fx-alignment: center;",
+      "-fx-background-color: %s; -fx-border-radius: 5px; -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: %s;",
       backgroundColor,
       fontColor
     );
   }
 
   private void updateScore() {
-    score += 10; // Increment score for demonstration; adjust based on your logic
-    scoreLabel.setText("Score: " + score);
-  }
-
-  private void animateTiles() {
-    for (var child : grid.getChildren()) {
-      if (child instanceof Label) {
-        Label tile = (Label) child;
-
-        // Animate each tile with TranslateTransition
-        TranslateTransition transition = new TranslateTransition(
-          Duration.millis(200),
-          tile
-        );
-        transition.setByX(0); // Adjust X movement if needed
-        transition.setByY(0); // Adjust Y movement if needed
-        transition.play();
-      }
+    score = controller.getCurrentScore();
+    if (score > bestScore) {
+      bestScore = score;
     }
+    scoreLabel.setText("Score: " + score);
+    bestScoreLabel.setText("Best: " + bestScore);
   }
 
   private void showGameOver() {
-    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    Alert alert = new Alert(Alert.AlertType.INFORMATION);
     alert.setTitle("Game Over");
     alert.setHeaderText("Game Over! Final Score: " + score);
-    alert.setContentText("Would you like to start a new game?");
-
-    // Add "Yes" and "No" options
-    alert
-      .getButtonTypes()
-      .setAll(
-        javafx.scene.control.ButtonType.YES,
-        javafx.scene.control.ButtonType.NO
-      );
-
-    var result = alert.showAndWait();
-    if (
-      result.isPresent() && result.get() == javafx.scene.control.ButtonType.YES
-    ) {
-      restartGame(); // Restart the game
-    } else {
-      System.exit(0); // Exit the program
-    }
+    alert.setContentText("Click OK to start a new game.");
+    alert.showAndWait();
+    restartGame();
   }
 
   private void restartGame() {
-    controller = new BoardController(); // Reset the board controller
+    controller = new BoardController(); // Reset the controller
     score = 0; // Reset the score
-    scoreLabel.setText("Score: " + score); // Update the score label
-    controller.addRandomTile(); // Add initial tiles
+    updateScore(); // Update the score display
+    controller.addRandomTile(); // Add two new random tiles
     controller.addRandomTile();
     updateBoard(); // Refresh the board
+    grid.getScene().getRoot().requestFocus(); // Ensure the root has focus for key handling
   }
 
   public static void main(String[] args) {
