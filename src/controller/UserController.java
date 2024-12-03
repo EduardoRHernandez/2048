@@ -41,7 +41,7 @@ public class UserController {
                 e.printStackTrace();
             }
             try {
-                UserFileHandler.saveUsersToFile(user, username);
+                UserFileHandler.saveUsersToFile(user, usersFile.getPath());
             } catch (IOException e) {
                 e.printStackTrace();
             }
