@@ -16,7 +16,7 @@ public class BoardTest {
     void setUp() {
         board = new Board(new Random(42));
     }
- 
+  
     @Test
     void testInitialization() {
         for (int i = 0; i < 4; i++) {
@@ -149,7 +149,21 @@ public class BoardTest {
 
         assertTrue(board.isGameOver());
     }
-
+    
+    @Test 
+    void testCurrentScore() {
+    	Tile tile1 = new Tile();
+    	tile1.setValue(4);
+    	Tile tile2 = new Tile();
+    	tile2.setValue(4);
+    	
+    	board.setTile(0, 2, tile1);
+    	board.setTile(1, 2, tile2);
+    	board.move(Directions.DOWN);
+    	
+    	assertEquals(8, board.getCurrentScore());
+    }
+    
     @Test
     void testToString() {
         Tile tile = new Tile();
