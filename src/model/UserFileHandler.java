@@ -45,7 +45,7 @@ public class UserFileHandler {
                 escapeComma(user.getEmail()) + "," +
                 escapeComma(user.getName()) + "," +
                 user.getHighestScore() + "," +
-                user.isPasswordCorrect(""); // Save hashed password
+                user.getPassword(); // Save hashed password
     }
 
     public static List<User> loadUsersFromFile(String filename) throws IOException {

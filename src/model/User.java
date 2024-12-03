@@ -50,6 +50,10 @@ public class User {
         return highestScore;
     }
 
+    public String getPassword() {
+        return hashedPassword;
+    }
+
     public void setHighestScore(int highestScore) {
         if (highestScore > this.highestScore) {
             this.highestScore = highestScore;
