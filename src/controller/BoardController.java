@@ -1,10 +1,10 @@
 package controller;
 
 import java.util.List;
-
 import model.*;
 
 public class BoardController {
+
     Board board;
 
     public BoardController() {
@@ -19,6 +19,12 @@ public class BoardController {
         board.move(Directions.UP);
     }
 
+    /************* ✨ Codeium Command ⭐ *************/
+    /**
+     * Moves the tiles down (positive y direction) on the board, combining tiles
+     * of the same value.
+     */
+    /****** 6c842576-a108-4727-971f-4d85626c41b9 *******/
     public void moveDown() {
         board.move(Directions.DOWN);
     }
@@ -37,10 +43,6 @@ public class BoardController {
 
     public void addRandomTile() {
         board.addRandomTile();
-    }
-
-    public boolean isGameOver() {
-        return board.isGameOver();
     }
 
     public int getCurrentScore() {
