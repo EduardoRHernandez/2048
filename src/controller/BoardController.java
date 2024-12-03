@@ -43,6 +43,10 @@ public class BoardController {
         return board.isGameOver();
     }
 
+    public int getCurrentScore() {
+        return board.getCurrentScore();
+    }
+
     public String toString() {
         return board.toString();
     }

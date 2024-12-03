@@ -9,6 +9,7 @@ public class Board {
     private ArrayList<Tile> aBoard;
     private static final int BOARD_SIZE = 4;
     private Random random;
+    private int currentScore = 0;
 
     public Board() {
         this.random = new Random();
@@ -47,6 +48,10 @@ public class Board {
 
     public void setTile(int x, int y, Tile tile) {
         aBoard.set(x * BOARD_SIZE + y, new Tile(tile));
+    }
+
+    public int getCurrentScore() {
+        return currentScore;
     }
 
     void resetMergedState() {
@@ -275,9 +280,11 @@ public class Board {
 
     // Extracted helper method to perform the merge
     private void performMerge(Tile currentTile, Tile nextTile) {
-        currentTile.setValue(currentTile.getValue() * 2);
+        int val = currentTile.getValue() * 2;
+        currentTile.setValue(val);
         currentTile.setMerged(true);
         nextTile.setValue(0);
+        this.currentScore += val;
     }
 
     public void addRandomTile() {
