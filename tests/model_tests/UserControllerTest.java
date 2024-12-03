@@ -116,4 +116,26 @@ class UserControllerTest {
         List<User> users = UserFileHandler.loadUsersFromFile(TEST_FILE);
         assertEquals(0, users.size());
     }
+    
+    @Test
+    void testAddUserIOException() {
+        // Simulate an IOException during addUser
+        File invalidFile = new File("invalid:/path/UserDatabase.csv");
+        UserController faultyController = new UserController(invalidFile);
+
+        assertDoesNotThrow(() -> {
+            faultyController.addUser("testuser", "password123", "test@example.com", "Test User", 100);
+        }, "addUser should handle IOException gracefully.");
+    }
+
+    @Test
+    void testGetUserIOException() {
+        // Simulate an IOException during getUser
+        File invalidFile = new File("invalid:/path/UserDatabase.csv"); 
+        UserController faultyController = new UserController(invalidFile);
+
+        User user = faultyController.getUser("testuser", "password123");
+        assertNull(user, "getUser should return null if IOException occurs.");
+    }
+
 }
