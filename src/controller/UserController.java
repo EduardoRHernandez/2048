@@ -13,6 +13,27 @@ public class UserController {
         this.usersFile = usersFile;
     }
 
+    public boolean addUser(User aUser) {
+        try {
+            // Load all users from the file
+            List<User> existingUsers = UserFileHandler.loadUsersFromFile(usersFile.getPath());
+            // Check for duplicates in username or email
+            for (User user : existingUsers) {
+                if (user.getUsername().equalsIgnoreCase(aUser.getUsername())) {
+                    return false;
+                }
+                if (user.getEmail().equalsIgnoreCase(aUser.getEmail())) {
+                    return false;
+                }
+            }
+            UserFileHandler.saveUsersToFile(aUser, usersFile.getPath());
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public boolean addUser(String username, String password, String email, String name, int highestScore) {
         User newUser = new User(username, password, email, name, highestScore);
         try {
