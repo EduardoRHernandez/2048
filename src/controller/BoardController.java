@@ -15,20 +15,20 @@ public class BoardController {
         this.board = board;
     }
 
-    public void moveUp() {
-        board.move(Directions.UP);
+    public boolean moveUp() {
+        return board.move(Directions.UP);
     }
 
-    public void moveDown() {
-        board.move(Directions.DOWN);
+    public boolean moveDown() {
+        return board.move(Directions.DOWN);
     }
 
-    public void moveLeft() {
-        board.move(Directions.LEFT);
+    public boolean moveLeft() {
+        return board.move(Directions.LEFT);
     }
 
-    public void moveRight() {
-        board.move(Directions.RIGHT);
+    public boolean moveRight() {
+        return board.move(Directions.RIGHT);
     }
 
     public List<Integer> getBoard() {
