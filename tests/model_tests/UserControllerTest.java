@@ -116,7 +116,7 @@ class UserControllerTest {
         List<User> users = UserFileHandler.loadUsersFromFile(TEST_FILE);
         assertEquals(0, users.size());
     }
-    
+     
     @Test
     void testAddUserIOException() {
         // Simulate an IOException during addUser
@@ -136,6 +136,33 @@ class UserControllerTest {
 
         User user = faultyController.getUser("testuser", "password123");
         assertNull(user, "getUser should return null if IOException occurs.");
+    }
+    
+    @Test
+    void testAddUserDuplicatePrevention() throws IOException {
+        // Add the first user
+        boolean isAdded = userController.addUser("testuser", "password123", "test@example.com", "Test User", 100);
+        assertTrue(isAdded);
+
+        // Attempt to add a user with the same username
+        isAdded = userController.addUser("testuser", "newpassword", "newemail@example.com", "Duplicate Username", 200);
+        assertFalse(isAdded);
+
+        // Attempt to add a user with the same email
+        isAdded = userController.addUser("newuser", "newpassword", "test@example.com", "Duplicate Email", 200);
+        assertFalse(isAdded);
+
+        // Verify that only the original user exists in the file
+        List<User> users = UserFileHandler.loadUsersFromFile(TEST_FILE);
+        assertEquals(1, users.size());
+        User user = users.get(0);
+
+        // Validate original user details
+        assertEquals("testuser", user.getUsername());
+        assertTrue(user.isPasswordCorrect("password123"));
+        assertEquals("test@example.com", user.getEmail());
+        assertEquals("Test User", user.getName());
+        assertEquals(100, user.getHighestScore());
     }
 
 }
