@@ -105,7 +105,7 @@ class UserControllerTest {
         userController.addUser("testuser", "password123", "test@example.com", "Test User", 100);
 
         List<User> users = UserFileHandler.loadUsersFromFile(TEST_FILE);
-        assertEquals(2, users.size()); // Assuming duplicate entries are allowed
+        assertEquals(1, users.size()); 
     }
 
     @Test
