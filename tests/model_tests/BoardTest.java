@@ -88,7 +88,7 @@ public class BoardTest {
         assertEquals(4, board.getTile(0, 3).getValue(), "Tile at (0, 3) should have value 4 after merge.");
         assertEquals(0, board.getTile(0, 2).getValue(), "Tile at (0, 2) should be empty after merge.");
     }
-    
+     
     @Test 
     void testMoveUp() {
     	Tile tile1 = new Tile();
@@ -173,5 +173,104 @@ public class BoardTest {
         String boardString = board.toString();
         assertTrue(boardString.contains("2"));
         assertTrue(boardString.contains("0"));
+    }
+    
+    @Test
+    void testDefaultConstructor() {
+        Board board = new Board();
+        assertNotNull(board);
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                assertEquals(0, board.getTile(i, j).getValue());
+            }
+        }
+    }
+
+    @Test
+    void testGetBoardValues() {
+        Board board = new Board(new Random(42));
+
+        Tile tile1 = new Tile();
+        tile1.setValue(2);
+        Tile tile2 = new Tile();
+        tile2.setValue(4);
+
+        board.setTile(0, 0, tile1);
+        board.setTile(1, 1, tile2);
+
+        List<Integer> boardValues = board.getBoardValues();
+
+        assertEquals(16, boardValues.size(), "Board should have 16 values.");
+        assertEquals(2, boardValues.get(0), "Tile (0,0) should have value 2.");
+        assertEquals(4, boardValues.get(5), "Tile (1,1) should have value 4.");
+        for (int i = 0; i < 16; i++) {
+            if (i != 0 && i != 5) {
+                assertEquals(0, boardValues.get(i), "All other tiles should have value 0.");
+            }
+        }
+    }
+
+    @Test
+    void testGetRow() {
+        Board board = new Board(new Random(42));
+
+        Tile tile1 = new Tile();
+        tile1.setValue(2);
+        Tile tile2 = new Tile();
+        tile2.setValue(4);
+
+        board.setTile(0, 0, tile1);
+        board.setTile(0, 3, tile2);
+
+        List<Tile> row = board.getRow(0);
+
+        assertEquals(4, row.size(), "Row should have 4 tiles.");
+        assertEquals(2, row.get(0).getValue(), "First tile in row should have value 2.");
+        assertEquals(4, row.get(3).getValue(), "Last tile in row should have value 4.");
+        for (int i = 1; i < 3; i++) {
+            assertEquals(0, row.get(i).getValue(), "Middle tiles should have value 0.");
+        }
+    }
+
+    @Test
+    void testGetColumn() {
+        Board board = new Board(new Random(42));
+
+        Tile tile1 = new Tile();
+        tile1.setValue(2);
+        Tile tile2 = new Tile();
+        tile2.setValue(4);
+
+        board.setTile(0, 0, tile1);
+        board.setTile(3, 0, tile2);
+
+        List<Tile> column = board.getColumn(0);
+
+        assertEquals(4, column.size(), "Column should have 4 tiles.");
+        assertEquals(2, column.get(0).getValue(), "First tile in column should have value 2.");
+        assertEquals(4, column.get(3).getValue(), "Last tile in column should have value 4.");
+        for (int i = 1; i < 3; i++) {
+            assertEquals(0, column.get(i).getValue(), "Middle tiles should have value 0.");
+        }
+    }
+    
+    @Test
+    void testGameIsOverFullBoardWithMoves() {
+        int[][] values = {
+            {2, 4, 8, 16},
+            {32, 64, 128, 256},
+            {512, 1024, 2048, 4096},
+            {8192, 16384, 16384, 65536}
+        };
+
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                Tile tile = new Tile();
+                tile.setValue(values[i][j]);
+                board.setTile(i, j, tile);
+            }
+        }
+
+        assertFalse(board.isGameOver(), "Game should not be over if a merge is possible.");
     }
 }

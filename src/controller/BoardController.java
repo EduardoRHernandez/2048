@@ -54,8 +54,4 @@ public class BoardController {
     public Tile getTile(int x, int y) {
         return board.getTile(x, y);
     }
-
-    public boolean isGameOver() {
-        return board.isGameOver();
-    }
 }
