@@ -80,7 +80,7 @@ public class Board {
         }
         return column;
     }
-    
+
     private List<Integer> snapshotBoard() {
         List<Integer> snapshot = new ArrayList<>();
         for (Tile tile : aBoard) {
@@ -88,7 +88,7 @@ public class Board {
         }
         return snapshot;
     }
-    
+
     private boolean hasBoardChanged(List<Integer> before, List<Integer> after) {
         for (int i = 0; i < before.size(); i++) {
             if (!before.get(i).equals(after.get(i))) {
@@ -98,12 +98,10 @@ public class Board {
         return false;
     }
 
-
-
     public boolean move(Directions direction) {
-    	// Snapshot the board before the move
+        // Snapshot the board before the move
         List<Integer> beforeMove = snapshotBoard();
-        
+
         switch (direction) {
             case UP:
                 moveUp();
@@ -118,15 +116,12 @@ public class Board {
                 moveRight();
                 break;
         }
-        
-	     // Snapshot the board after the move
-	     List<Integer> afterMove = snapshotBoard();
-	     
-	     // Add a random tile only if the board has changed
-	     if (hasBoardChanged(beforeMove, afterMove)) {
-	         return true;
-	     }
-	     return false;
+
+        // Snapshot the board after the move
+        List<Integer> afterMove = snapshotBoard();
+
+        // Add a random tile only if the board has changed
+        return hasBoardChanged(beforeMove, afterMove);
     }
 
     private void moveLeft() {

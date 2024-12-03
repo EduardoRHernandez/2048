@@ -92,7 +92,8 @@ public class UserFileHandler {
         List<User> users = loadUsersFromFile(filename);
         for (User user : users) {
             if (user.getUsername().equals(username) && user.isPasswordCorrect(password)) {
-                return user;
+                return new User(user.getUsername(), user.getPassword(), user.getEmail(), user.getName(),
+                        user.getHighestScore(), true);
             }
         }
         return null;
@@ -102,7 +103,19 @@ public class UserFileHandler {
         List<User> users = loadUsersFromFile(filename);
         for (User user : users) {
             if (user.getUsername().equals(username) && user.getName().equals(name) && user.getEmail().equals(email)) {
-                return user;
+                return new User(user.getUsername(), user.getPassword(), user.getEmail(), user.getName(),
+                        user.getHighestScore(), true);
+            }
+        }
+        return null;
+    }
+
+    public static User getUser(String username, String filename) throws IOException {
+        List<User> users = loadUsersFromFile(filename);
+        for (User user : users) {
+            if (user.getUsername().equals(username)) {
+                return new User(user.getUsername(), user.getPassword(), user.getEmail(), user.getName(),
+                        user.getHighestScore(), true);
             }
         }
         return null;
