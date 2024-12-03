@@ -3,6 +3,7 @@ package view;
 import controller.BoardController;
 import javafx.application.Application;
 import javafx.geometry.HPos;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -29,8 +30,20 @@ public class GUI extends Application {
   public void start(Stage primaryStage) {
     // Initialize the game controller
     controller = new BoardController();
+
+    // Set up the game grid (initialize before using it)
+    grid = new GridPane();
+    grid.setHgap(10);
+    grid.setVgap(10);
+    grid.setPrefSize(400, 400); // Fix the size of the grid
+    grid.setAlignment(Pos.CENTER);
+
+    // Add two random tiles at the start
     controller.addRandomTile();
     controller.addRandomTile();
+
+    // Display the initial board
+    updateBoard(); // Ensure the grid reflects the board state immediately
 
     // Initialize scores
     score = controller.getCurrentScore();
@@ -52,14 +65,14 @@ public class GUI extends Application {
       "-fx-background-color: #bbada0; -fx-padding: 10; -fx-border-radius: 5px;"
     );
     scoreBox.getChildren().add(scoreLabel);
-    scoreBox.setPrefSize(150, 50); // Fix the size of the background box
+    scoreBox.setPrefSize(150, 50);
 
     StackPane bestScoreBox = new StackPane();
     bestScoreBox.setStyle(
       "-fx-background-color: #bbada0; -fx-padding: 10; -fx-border-radius: 5px;"
     );
     bestScoreBox.getChildren().add(bestScoreLabel);
-    bestScoreBox.setPrefSize(150, 50); // Fix the size of the background box
+    bestScoreBox.setPrefSize(150, 50);
 
     // Set up the "New Game" button
     Button newGameButton = new Button("New Game");
@@ -77,26 +90,24 @@ public class GUI extends Application {
     );
     scoreBoxContainer.setAlignment(Pos.CENTER);
 
-    // Set up the game grid
-    grid = new GridPane();
-    grid.setHgap(10);
-    grid.setVgap(10);
-    grid.setPrefSize(400, 400); // Fix the size of the grid
-    grid.setStyle(
-      "-fx-background-color: #bbada0; -fx-padding: 20; -fx-border-radius: 10px;"
+    // Create a StackPane to wrap the grid and control the background
+    StackPane gridWrapper = new StackPane();
+    gridWrapper.setStyle(
+      "-fx-background-color: #bbada0; -fx-border-radius: 10px;"
     );
-    grid.setAlignment(Pos.CENTER); // Center-align the grid in its container
+    gridWrapper.setMaxSize(440, 440); // Slightly larger than the grid to add padding
+    gridWrapper.setPadding(new Insets(10)); // Add padding to spread the background
+    gridWrapper.getChildren().add(grid); // Add the grid to the StackPane
 
-    // Display the initial board
-    updateBoard();
-
-    // Combine scoreBoxContainer and grid into a VBox layout
-    VBox root = new VBox(20, scoreBoxContainer, grid);
+    // Combine scoreBoxContainer and gridWrapper into a VBox layout
+    VBox root = new VBox(20, scoreBoxContainer, gridWrapper);
     root.setStyle("-fx-background-color: #faf8ef; -fx-padding: 20;");
     root.setAlignment(Pos.TOP_CENTER);
 
     // Prevent grid stretching when fullscreen
-    VBox.setVgrow(grid, null);
+    VBox.setVgrow(gridWrapper, null);
+
+    updateBoard();
 
     // Create the scene
     Scene scene = new Scene(root, 500, 600);
@@ -104,31 +115,33 @@ public class GUI extends Application {
 
     // Add key press event handler
     scene.setOnKeyPressed(event -> {
+      boolean validMove = false;
+
       switch (event.getCode()) {
         case UP:
-          controller.moveUp();
+          validMove = controller.moveUp();
           break;
         case DOWN:
-          controller.moveDown();
+          validMove = controller.moveDown();
           break;
         case LEFT:
-          controller.moveLeft();
+          validMove = controller.moveLeft();
           break;
         case RIGHT:
-          controller.moveRight();
+          validMove = controller.moveRight();
           break;
         default:
           return; // Ignore other keys
       }
 
-      // Update the game state
-      controller.addRandomTile();
-      updateScore();
-      updateBoard();
+      if (validMove) {
+        controller.addRandomTile();
+        updateScore();
+        updateBoard();
 
-      // Check if the game is over
-      if (controller.isGameOver()) {
-        showGameOver();
+        if (controller.isGameOver()) {
+          showGameOver();
+        }
       }
     });
 
