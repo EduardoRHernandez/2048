@@ -255,6 +255,31 @@ public class BoardTest {
     }
     
     @Test
+    void testMoveReturnValue() {
+        // Set up initial board state with no possible moves to the left
+        Tile tile1 = new Tile();
+        tile1.setValue(2);
+        Tile tile2 = new Tile();
+        tile2.setValue(4);
+
+        board.setTile(0, 0, tile1);
+        board.setTile(0, 1, tile2);
+
+        // Try moving left (shouldn't change the state)
+        assertFalse(board.move(Directions.LEFT));
+
+        // Set up a new board state where a move will change the state
+        Tile tile3 = new Tile();
+        tile3.setValue(2);
+        board.setTile(1, 0, tile3);
+        board.setTile(1, 1, tile3);
+
+        // Try moving left (should merge the tiles and change the state)
+        assertTrue(board.move(Directions.LEFT));
+    }
+
+    
+    @Test
     void testGameIsOverFullBoardWithMoves() {
         int[][] values = {
             {2, 4, 8, 16},
