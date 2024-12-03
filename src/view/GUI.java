@@ -21,12 +21,15 @@ public class GUI extends Application {
 
   @Override
   public void start(Stage primaryStage) {
+    // Initialize the game controller
     controller = new BoardController();
-    controller.addRandomTile(); // Add initial random tile
-    controller.addRandomTile(); // Add another random tile
-    score = 0;
+    controller.addRandomTile(); // Add the first random tile
+    controller.addRandomTile(); // Add the second random tile
 
-    // Set up the score display
+    // Initialize the score using controller
+    score = controller.getCurrentScore();
+
+    // Set up the score label
     scoreLabel = new Label("Score: " + score);
     scoreLabel.setStyle(
       "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #f9f6f2;"
@@ -38,19 +41,21 @@ public class GUI extends Application {
     grid.setVgap(10); // Vertical gap between tiles
     grid.setStyle("-fx-background-color: #bbada0; -fx-padding: 10;");
 
-    updateBoard(); // Display the initial board
+    // Display the initial board
+    updateBoard();
 
-    // Combine score and grid into a layout
+    // Combine the score label and game grid into a VBox layout
     VBox root = new VBox(10, scoreLabel, grid);
     root.setStyle("-fx-background-color: #faf8ef; -fx-padding: 20;");
-    root.setAlignment(Pos.CENTER);
+    root.setAlignment(Pos.TOP_CENTER); // Align everything at the top center
 
+    // Create the scene and add a key press event handler
     Scene scene = new Scene(root, 500, 600);
     scene.setOnKeyPressed(event -> {
       switch (event.getCode()) {
         case UP:
           controller.moveUp();
-          updateScore();
+          updateScore(); // Update the score after moving
           break;
         case DOWN:
           controller.moveDown();
@@ -72,11 +77,13 @@ public class GUI extends Application {
       animateTiles(); // Animate the tile movement
       updateBoard(); // Refresh the UI
 
+      // Check if the game is over
       if (controller.isGameOver()) {
         showGameOver();
       }
     });
 
+    // Set up the primary stage
     primaryStage.setTitle("2048 Game");
     primaryStage.setScene(scene);
     primaryStage.show();
