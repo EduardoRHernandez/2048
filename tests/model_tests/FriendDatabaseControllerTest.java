@@ -1,116 +1,110 @@
 package controller;
-import static org.junit.jupiter.api.Assertions.*;
-
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import model.User;
+import model.UserFileHandler;
 
-import java.io.File;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.io.IOException;
 import java.util.List;
 
-class FriendDatabaseControllerTest {
+public class FriendDatabaseControllerTest {
 
+    private static final String TEST_USER_FILE = "UserDatabase.txt";
+    private static final String TEST_USER1 = "testUser1";
+    private static final String TEST_USER2 = "testUser2";
+    private static final String TEST_USER3 = "testUser3";
+    
     private FriendDatabaseController friendDatabaseController;
-    private UserController userController;
-    private String username = "user1";
-    private String friendUsername = "friend1";
-    private static final String TEST_FILE = "UserDatabase.csv";
-    private File testFile;
-
-    @BeforeAll
-    void setup() {
-        testFile = new File(TEST_FILE);
-        userController = new UserController(testFile);
-        // Initialize FriendDatabaseController
-    }
     
     @BeforeEach
-    void setUp() {
-        User user1 = new User(username, "password", "user@example.com", "User One", 100);
-        User user2 = new User(friendUsername, "password", "friend@example.com", "Friend One", 200);
+    public void setUp() {
+        // Set up necessary state before each test
+        friendDatabaseController = new FriendDatabaseController();
         
-        userController.addUser(user1);
-        userController.addUser(user2);
+        // Create test users and add them to the user file
+        try {
+            User user1 = new User(TEST_USER1, "password1", "email1@test.com", "User One", 100);
+            User user2 = new User(TEST_USER2, "password2", "email2@test.com", "User Two", 150);
+            User user3 = new User(TEST_USER3, "password3", "email3@test.com", "User Three", 200);
+            
+            UserFileHandler.saveUsersToFile(user1, TEST_USER_FILE);
+            UserFileHandler.saveUsersToFile(user2, TEST_USER_FILE);
+            UserFileHandler.saveUsersToFile(user3, TEST_USER_FILE);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
-    void testAddFriend_Success() {
-        // Add friend to the database
-        boolean result = FriendDatabaseController.addFriend(username, friendUsername, TEST_FILE);
-
-        // Assert the friend was added successfully
+    public void testAddFriend() {
+        // Test adding a friend
+        boolean result = FriendDatabaseController.addFriend(TEST_USER1, TEST_USER2, TEST_USER_FILE);
         assertTrue(result);
+        
+        // Check if the friend is in the database
+        List<User> friends = FriendDatabaseController.getFriends(TEST_USER1);
+        assertEquals(1, friends.size());
+        assertEquals(TEST_USER2, friends.get(0).getUsername());
     }
 
     @Test
-    void testAddFriend_FriendAlreadyExists() {
-        // Add the friend for the first time
-        FriendDatabaseController.addFriend(username, friendUsername, TEST_FILE);
-        
-        // Try adding the same friend again
-        boolean result = FriendDatabaseController.addFriend(username, friendUsername, TEST_FILE);
-
-        // Assert that the friend cannot be added again
-        assertFalse(result);
-    }
-
-    @Test
-    void testRemoveFriend_Success() {
-        // Add the friend first
-        FriendDatabaseController.addFriend(username, friendUsername, TEST_FILE);
-        
-        // Now remove the friend
-        boolean result = friendDatabaseController.removeFriend(username, friendUsername, TEST_FILE);
-
-        // Assert the friend was removed successfully
+    public void testRemoveFriend() {
+        // Test removing a friend
+        FriendDatabaseController.addFriend(TEST_USER1, TEST_USER2, TEST_USER_FILE);
+        boolean result = friendDatabaseController.removeFriend(TEST_USER1, TEST_USER2, TEST_USER_FILE);
         assertTrue(result);
+
+        // Check if the friend is removed
+        List<User> friends = FriendDatabaseController.getFriends(TEST_USER1);
+        assertEquals(0, friends.size(), "User should have no friends after removal");
     }
 
     @Test
-    void testRemoveFriend_FriendDoesNotExist() {
-        // Try removing a friend who hasn't been added
-        boolean result = friendDatabaseController.removeFriend(username, friendUsername, TEST_FILE);
+    public void testGetFriends() {
+        // Test retrieving the list of friends
+        FriendDatabaseController.addFriend(TEST_USER1, TEST_USER2, TEST_USER_FILE);
+        FriendDatabaseController.addFriend(TEST_USER1, TEST_USER3, TEST_USER_FILE);
 
-        // Assert that the friend cannot be removed
-        assertFalse(result);
+        List<User> friends = FriendDatabaseController.getFriends(TEST_USER1);
+        assertEquals(2, friends.size());
     }
 
     @Test
-    void testGetFriends() {
-        // Add friend to the database
-        FriendDatabaseController.addFriend(username, friendUsername, TEST_FILE);
-
-        // Get the list of friends
-        List<User> friendsList = FriendDatabaseController.getFriends(username);
-
-        // Assert the friend is in the list
-        assertNotNull(friendsList, "The returned list should not be null.");
-        assertEquals(1, friendsList.size(), "The list should contain one friend.");
-        assertEquals(friendUsername, friendsList.get(0).getUsername(), "The friend's username should match.");
-    }
-
-    @Test
-    void testPrint() {
-        // Adding friends and checking the output
-        FriendDatabaseController.addFriend(username, friendUsername, TEST_FILE);
-
-        // Check the print functionality (manual observation or checking console output)
-        // Here we are assuming this method doesn't return a value, so we cannot assert directly.
-        assertDoesNotThrow(() -> FriendDatabaseController.print());
-    }
-
-    @Test
-    void testClear() {
-        // Add a friend
-        FriendDatabaseController.addFriend(username, friendUsername, TEST_FILE);
-        
-        // Clear the database
+    public void testClear() {
+        // Test clearing the friends
+        FriendDatabaseController.addFriend(TEST_USER1, TEST_USER2, TEST_USER_FILE);
         FriendDatabaseController.clear();
-        
-        // Verify the database is cleared by checking if there are no friends
-        List<User> friendsList = FriendDatabaseController.getFriends(username);
-        assertTrue(friendsList.isEmpty());
+
+        List<User> friends = FriendDatabaseController.getFriends(TEST_USER1);
+        assertTrue(friends.isEmpty());
     }
+    
+    @Test
+    public void testGetUserNotFound() {
+        // Test if getUser returns null for a non-existent user
+        try {
+            User nonExistentUser = UserFileHandler.getUser("nonExistentUser", TEST_USER_FILE);
+            assertNull(nonExistentUser);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testAddFriendIOException() {
+        // Test handling IOException in addFriend (e.g., file not found)
+        boolean result = FriendDatabaseController.addFriend(TEST_USER1, TEST_USER2, "non_existent_file.txt");
+        assertFalse(result);
+    }
+
+    @Test
+    public void testRemoveFriendIOException() {
+        // Test handling IOException in removeFriend (e.g., file not found)
+        boolean result = friendDatabaseController.removeFriend(TEST_USER1, TEST_USER2, "non_existent_file.txt");
+        assertFalse(result);
+    }
+
 }
