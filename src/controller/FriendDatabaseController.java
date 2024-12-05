@@ -1,20 +1,42 @@
 package controller;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.io.IOException;
 import java.util.List;
 
 import model.FriendDatabase;
 import model.User;
 
 public class FriendDatabaseController {
-    private UserController userController;
 
+    private UserController userController;
+    private static final String USER_CONTROLLER_NULL_ERROR = "User controller must be non-null";
+    private static final String USERNAME_VALIDATION_MESSAGE = "Username must be non-null and not empty";
+
+    /**
+     * @param userController the user controller to use when adding and removing
+     *                       friends
+     * @pre userController != null
+     */
     public FriendDatabaseController(UserController userController) {
+        assert userController != null : USER_CONTROLLER_NULL_ERROR;
         this.userController = userController;
     }
 
+    /**
+     * @param username       the username of the user who is adding the friend
+     * @param friendUsername the username of the friend being added
+     * @return true if the friend was added successfully, false if the friend could
+     *         not
+     *         be added
+     * @pre userController != null
+     * @pre username != null and not empty
+     * @pre friendUsername != null and not empty
+     */
     public boolean addFriend(String username, String friendUsername) {
+        assert userController != null : USER_CONTROLLER_NULL_ERROR;
+        assert username != null && !username.isEmpty() : USERNAME_VALIDATION_MESSAGE;
+        assert friendUsername != null && !friendUsername.isEmpty() : "Friend username must be non-null and not empty";
+
         User friendUser;
         User adderUser;
         friendUser = this.userController.getUser(friendUsername);
@@ -26,40 +48,103 @@ public class FriendDatabaseController {
                 && FriendDatabase.addFriend(friendUser.getUsername(), adderUser);
     }
 
+    /**
+     * @param username       the username of the user who is removing the friend
+     * @param friendUsername the username of the friend being removed
+     * @return true if the friend was removed successfully, false if the friend
+     *         could
+     *         not be removed
+     * @pre userController != null
+     * @pre username != null and not empty
+     * @pre friendUsername != null and not empty
+     */
     public boolean removeFriend(String username, String friendUsername) {
+        assert userController != null : USER_CONTROLLER_NULL_ERROR;
+        assert username != null && !username.isEmpty() : USERNAME_VALIDATION_MESSAGE;
+        assert friendUsername != null && !friendUsername.isEmpty() : "Friend username must be non-null and not empty";
+
         User friendUser;
         User removeUser;
-        friendUser = userController.getUser(friendUsername);
-        removeUser = userController.getUser(username);
+        friendUser = this.userController.getUser(friendUsername);
+        removeUser = this.userController.getUser(username);
+        if (friendUser == null) {
+            return false;
+        }
         return FriendDatabase.removeFriend(username, friendUser)
                 && FriendDatabase.removeFriend(removeUser.getUsername(), friendUser);
     }
 
+    /**
+     * @param username the username of the user whose friends are to be retrieved
+     * @return the list of friends for the given user
+     * @pre username is non-null and not empty
+     * @post the list of friends is not null and is not empty if the user has
+     *       friends
+     */
     public List<User> getFriends(String username) {
+        assert username != null && !username.isEmpty() : USERNAME_VALIDATION_MESSAGE;
         List<User> friends = FriendDatabase.getFriends(username);
-        List<User> deepCopies = new ArrayList<>();
-        for (User friend : friends) {
-            deepCopies.add(new User(friend.getUsername(), friend.getPassword(), friend.getEmail(), friend.getName(),
-                    friend.getHighestScore(), true));
+        assert friends != null && !friends.isEmpty()
+                : "List of friends must not be null or empty if the user has friends";
+        return friends;
+    }
+
+    /**
+     * Saves the friends database to the specified file.
+     * 
+     * @param friendFile the file to save the friends database to
+     * @pre friendFile is non-null and not empty
+     * @post the friends database has been saved to the specified file
+     */
+    public void saveFriends(String friendFile) {
+        assert friendFile != null && !friendFile.isEmpty() : "Friend file must be non-null and not empty";
+
+        try {
+            FriendDatabase.saveFriends(friendFile);
+        } catch (IOException e) {
+            System.err.println("Error saving friends: " + e.getMessage());
         }
-        return Collections.unmodifiableList(deepCopies);
-
     }
 
-    public void saveFriends() {
-        FriendDatabase.saveFriends();
-    }
-
+    /**
+     * Loads the friends database from the specified files.
+     * 
+     * @param userFile   the file containing user data
+     * @param friendFile the file containing friend relationships
+     * @pre userFile and friendFile are non-null and not empty
+     * @post the friends database has been loaded from the specified files
+     */
     public void loadFriends(String userFile, String friendFile) {
-        FriendDatabase.loadFriends(userFile, friendFile);
+        assert userFile != null && !userFile.isEmpty() : "User file must be non-null and not empty";
+        assert friendFile != null && !friendFile.isEmpty() : "Friend file must be non-null and not empty";
+
+        try {
+            FriendDatabase.loadFriends(userFile, friendFile);
+        } catch (IOException e) {
+            System.err.println("Error loading friends: " + e.getMessage());
+        }
     }
 
+    /**
+     * Prints the friends database.
+     * 
+     * @pre The friends database is initialized
+     * @post The friends database has been printed to the console
+     */
     public void print() {
+        assert FriendDatabase.getFriends("") != null : "Friends database must be initialized";
         FriendDatabase.print();
     }
 
+    /**
+     * Clears the friends database.
+     * 
+     * @pre The friends database is initialized
+     * @post The friends database is empty
+     */
     public void clear() {
+        assert FriendDatabase.getFriends("") != null : "Friends database must be initialized";
         FriendDatabase.clear();
+        assert FriendDatabase.getFriends("").isEmpty() : "Friends database should be empty after clear";
     }
-
 }
