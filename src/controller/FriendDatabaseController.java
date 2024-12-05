@@ -35,7 +35,7 @@ public class FriendDatabaseController {
                 && FriendDatabase.removeFriend(removeUser.getUsername(), friendUser);
     }
 
-    public static List<User> getFriends(String username) {
+    public List<User> getFriends(String username) {
         List<User> friends = FriendDatabase.getFriends(username);
         List<User> deepCopies = new ArrayList<>();
         for (User friend : friends) {
@@ -46,19 +46,19 @@ public class FriendDatabaseController {
 
     }
 
-    public static void saveFriends() {
+    public void saveFriends() {
         FriendDatabase.saveFriends();
     }
 
-    public static void loadFriends(String userFile, String friendFile) {
+    public void loadFriends(String userFile, String friendFile) {
         FriendDatabase.loadFriends(userFile, friendFile);
     }
 
-    public static void print() {
+    public void print() {
         FriendDatabase.print();
     }
 
-    public static void clear() {
+    public void clear() {
         FriendDatabase.clear();
     }
 
