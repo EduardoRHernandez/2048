@@ -20,6 +20,15 @@ public class Board {
         initializeBoard();
     }
 
+    public Board(Board board) {
+        this.aBoard = new ArrayList<>();
+        for (Tile tile : board.aBoard) {
+            this.aBoard.add(new Tile(tile));
+        }
+        this.currentScore = board.currentScore;
+        this.random = new Random();
+    }
+
     public Board(Random random) {
         this.random = random;
         initializeBoard();
