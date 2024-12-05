@@ -8,17 +8,17 @@ import model.FriendDatabase;
 import model.User;
 
 public class FriendDatabaseController {
-    private static UserController userController;
+    private UserController userController;
 
-    public static void setUserController(UserController userController) {
-        FriendDatabaseController.userController = userController;
+    public void setUserController(UserController userController) {
+        this.userController = userController;
     }
 
-    public static boolean addFriend(String username, String friendUsername) {
+    public boolean addFriend(String username, String friendUsername) {
         User friendUser;
         User adderUser;
-        friendUser = userController.getUser(friendUsername);
-        adderUser = userController.getUser(username);
+        friendUser = this.userController.getUser(friendUsername);
+        adderUser = this.userController.getUser(username);
         if (friendUser == null) {
             return false;
         }
