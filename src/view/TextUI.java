@@ -51,8 +51,6 @@ public class TextUI {
             if (boardController.isGameOver()) {
                 System.out.println("Game over! Your final score is: " + currentUser.getHighestScore());
                 playing = false;
-            } else {
-                boardController.addRandomTile();
             }
         }
 

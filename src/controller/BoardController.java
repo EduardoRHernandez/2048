@@ -19,12 +19,6 @@ public class BoardController {
     return board.move(Directions.UP);
   }
 
-  /*************  ✨ Codeium Command ⭐  *************/
-  /**
-   * Moves the tiles down.
-   * @return true if the board state changed (i.e. a tile was moved or merged), false otherwise
-   */
-  /******  d974140c-7252-4e2d-a650-ce56d20c31b4  *******/
   public boolean moveDown() {
     return board.move(Directions.DOWN);
   }

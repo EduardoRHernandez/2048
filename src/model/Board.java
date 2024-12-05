@@ -121,7 +121,13 @@ public class Board {
         List<Integer> afterMove = snapshotBoard();
 
         // Add a random tile only if the board has changed
-        return hasBoardChanged(beforeMove, afterMove);
+        if (hasBoardChanged(beforeMove, afterMove)) {
+            addRandomTile();
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     private void moveLeft() {
