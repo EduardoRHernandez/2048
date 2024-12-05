@@ -50,8 +50,8 @@ public class FriendDatabaseController {
         FriendDatabase.saveFriends();
     }
 
-    public static void loadFriends(String userFile) {
-        FriendDatabase.loadFriends(userFile);
+    public static void loadFriends(String userFile, String friendFile) {
+        FriendDatabase.loadFriends(userFile, friendFile);
     }
 
     public static void print() {
