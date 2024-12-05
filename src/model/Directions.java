@@ -8,6 +8,7 @@ public enum Directions {
 
     private final boolean isForward; // TRUE for UP/LEFT, FALSE for DOWN/RIGHT
     private final boolean isRow; // TRUE for horizontal movement (LEFT/RIGHT)
+    public static final boolean ALWAYS_VALID = true;
 
     Directions(boolean isForward, boolean isRow) {
         this.isForward = isForward;
@@ -20,6 +21,10 @@ public enum Directions {
 
     public boolean isRow() {
         return isRow;
+    }
+
+    public boolean isValid() {
+        return ALWAYS_VALID;
     }
 
     @Override
