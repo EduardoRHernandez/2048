@@ -35,7 +35,7 @@ public class FriendDatabase {
 
     public static boolean removeFriend(String username, User friend) {
         if (friends.containsKey(username)) {
-        	return friends.get(username).remove(friend);
+            return friends.get(username).remove(friend);
         } else
             return false;
     }
