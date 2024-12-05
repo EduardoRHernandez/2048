@@ -52,7 +52,6 @@ public class FriendDatabase {
             for (Map.Entry<String, ArrayList<User>> entry : friends.entrySet()) {
                 String line = entry.getKey() + ": "
                         + entry.getValue().stream().map(User::getUsername).collect(Collectors.joining(", "));
-                System.out.println(line);
                 writer.println(line);// Write each entry to the file
             }
         } catch (IOException e) {
@@ -60,10 +59,9 @@ public class FriendDatabase {
         }
     }
 
-    public static void loadFriends(String userFile) {
-        String fileName = "Friends.txt";
+    public static void loadFriends(String userFile, String friendFile) {
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(friendFile))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(": ", -1); // Split by colon with all fields
