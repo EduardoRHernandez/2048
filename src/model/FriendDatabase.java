@@ -52,9 +52,9 @@ public class FriendDatabase {
             for (Map.Entry<String, ArrayList<User>> entry : friends.entrySet()) {
                 String line = entry.getKey() + ": "
                         + entry.getValue().stream().map(User::getUsername).collect(Collectors.joining(", "));
+                System.out.println(line);
                 writer.println(line);// Write each entry to the file
             }
-            System.out.println("HashMap saved successfully to " + fileName);
         } catch (IOException e) {
             System.err.println("Error writing to file: " + e.getMessage());
         }
@@ -76,7 +76,6 @@ public class FriendDatabase {
                 }
                 FriendDatabase.friends.put(username, friends);
             }
-            System.out.println("HashMap loaded successfully from " + fileName);
         } catch (IOException e) {
             System.err.println("Error reading file: " + e.getMessage());
         }
