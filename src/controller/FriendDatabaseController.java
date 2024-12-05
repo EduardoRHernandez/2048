@@ -10,7 +10,7 @@ import model.User;
 public class FriendDatabaseController {
     private UserController userController;
 
-    public void setUserController(UserController userController) {
+    public FriendDatabaseController(UserController userController) {
         this.userController = userController;
     }
 
