@@ -164,7 +164,6 @@ public class GUI extends Application {
       }
 
       if (validMove) {
-        controller.addRandomTile();
         updateScore();
         updateBoard();
 
