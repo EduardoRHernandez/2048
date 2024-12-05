@@ -51,8 +51,8 @@ public class FriendDatabase {
         try (PrintWriter writer = new PrintWriter(new FileWriter(fileName))) {
             for (Map.Entry<String, ArrayList<User>> entry : friends.entrySet()) {
                 String line = entry.getKey() + ": "
-                        + entry.getValue().stream().map(Object::toString).collect(Collectors.joining(", "));
-                writer.println(line); // Write each entry to the file
+                        + entry.getValue().stream().map(User::getUsername).collect(Collectors.joining(", "));
+                writer.println(line);// Write each entry to the file
             }
             System.out.println("HashMap saved successfully to " + fileName);
         } catch (IOException e) {
@@ -66,7 +66,7 @@ public class FriendDatabase {
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(": "); // Split by colon with all fields
+                String[] parts = line.split(": ", -1); // Split by colon with all fields
                 String username = parts[0];
                 String friendsString = parts[1];
                 String[] friendsArray = friendsString.split(", ");
