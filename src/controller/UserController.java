@@ -13,6 +13,14 @@ public class UserController {
         this.usersFile = usersFile;
     }
 
+    /**
+     * Add a user to the user database file.
+     * 
+     * @param aUser the user to add
+     * @return true if the user was added successfully, false if the user could not
+     *         be added
+     * @pre aUser != null
+     */
     public boolean addUser(User aUser) {
         try {
             // Load all users from the file
