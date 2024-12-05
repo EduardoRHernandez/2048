@@ -1,35 +1,38 @@
 package controller;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import model.FriendDatabase;
 import model.User;
-import model.UserFileHandler;
 
 public class FriendDatabaseController {
-    public static boolean addFriend(String username, String friendUsername, String userFile) {
-        User friendUser;
-        try {
-            friendUser = UserFileHandler.getUser(friendUsername, userFile);
-            return FriendDatabase.addFriend(username, friendUser);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
+    private static UserController userController;
+
+    public static void setUserController(UserController userController) {
+        FriendDatabaseController.userController = userController;
     }
 
-    public boolean removeFriend(String username, String friendUsername, String userFile) {
+    public static boolean addFriend(String username, String friendUsername) {
         User friendUser;
-        try {
-            friendUser = UserFileHandler.getUser(friendUsername, userFile);
-            return FriendDatabase.removeFriend(username, friendUser);
-        } catch (IOException e) {
-            e.printStackTrace();
+        User adderUser;
+        friendUser = userController.getUser(friendUsername);
+        adderUser = userController.getUser(username);
+        if (friendUser == null) {
             return false;
         }
+        return FriendDatabase.addFriend(username, friendUser)
+                && FriendDatabase.addFriend(friendUser.getUsername(), adderUser);
+    }
+
+    public boolean removeFriend(String username, String friendUsername) {
+        User friendUser;
+        User removeUser;
+        friendUser = userController.getUser(friendUsername);
+        removeUser = userController.getUser(username);
+        return FriendDatabase.removeFriend(username, friendUser)
+                && FriendDatabase.removeFriend(removeUser.getUsername(), friendUser);
     }
 
     public static List<User> getFriends(String username) {
@@ -41,6 +44,14 @@ public class FriendDatabaseController {
         }
         return Collections.unmodifiableList(deepCopies);
 
+    }
+
+    public static void saveFriends() {
+        FriendDatabase.saveFriends();
+    }
+
+    public static void loadFriends(String userFile) {
+        FriendDatabase.loadFriends(userFile);
     }
 
     public static void print() {
