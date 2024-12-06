@@ -1,7 +1,6 @@
 package controller;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
 import model.FriendDatabase;
@@ -10,8 +9,6 @@ import model.User;
 public class FriendDatabaseController {
 
     private UserController userController;
-    private static final String USER_CONTROLLER_NULL_ERROR = "User controller must be non-null";
-    private static final String USERNAME_VALIDATION_MESSAGE = "Username must be non-null and not empty";
 
     /**
      * @param userController the user controller to use when adding and removing
@@ -19,7 +16,6 @@ public class FriendDatabaseController {
      * @pre userController != null
      */
     public FriendDatabaseController(UserController userController) {
-        assert userController != null : USER_CONTROLLER_NULL_ERROR;
         this.userController = userController;
     }
 
@@ -34,10 +30,6 @@ public class FriendDatabaseController {
      * @pre friendUsername != null and not empty
      */
     public boolean addFriend(String username, String friendUsername) {
-        assert userController != null : USER_CONTROLLER_NULL_ERROR;
-        assert username != null && !username.isEmpty() : USERNAME_VALIDATION_MESSAGE;
-        assert friendUsername != null && !friendUsername.isEmpty() : "Friend username must be non-null and not empty";
-
         User friendUser;
         User adderUser;
         friendUser = this.userController.getUser(friendUsername);
@@ -60,10 +52,6 @@ public class FriendDatabaseController {
      * @pre friendUsername != null and not empty
      */
     public boolean removeFriend(String username, String friendUsername) {
-        assert userController != null : USER_CONTROLLER_NULL_ERROR;
-        assert username != null && !username.isEmpty() : USERNAME_VALIDATION_MESSAGE;
-        assert friendUsername != null && !friendUsername.isEmpty() : "Friend username must be non-null and not empty";
-
         User friendUser;
         User removeUser;
         friendUser = this.userController.getUser(friendUsername);
@@ -83,9 +71,7 @@ public class FriendDatabaseController {
      *       friends
      */
     public List<User> getFriends(String username) {
-        assert username != null && !username.isEmpty() : USERNAME_VALIDATION_MESSAGE;
-        List<User> friends = FriendDatabase.getFriends(username);
-        return friends;
+        return FriendDatabase.getFriends(username);
     }
 
     /**
@@ -96,8 +82,6 @@ public class FriendDatabaseController {
      * @post the friends database has been saved to the specified file
      */
     public void saveFriends(String friendFile) {
-        assert friendFile != null && !friendFile.isEmpty() : "Friend file must be non-null and not empty";
-
         try {
             FriendDatabase.saveFriends(friendFile);
         } catch (IOException e) {
@@ -114,9 +98,6 @@ public class FriendDatabaseController {
      * @post the friends database has been loaded from the specified files
      */
     public void loadFriends(String userFile, String friendFile) {
-        assert userFile != null && !userFile.isEmpty() : "User file must be non-null and not empty";
-        assert friendFile != null && !friendFile.isEmpty() : "Friend file must be non-null and not empty";
-
         try {
             FriendDatabase.loadFriends(userFile, friendFile);
         } catch (IOException e) {

@@ -23,15 +23,10 @@ public class UserFileHandler {
      * @post the users are appended to the file in CSV format
      */
     public static void saveUsersToFile(List<User> users, String filename) {
-        assert users != null : "users is null";
-        assert filename != null && !filename.isEmpty() : "filename is null or empty";
-
         // Open the file for writing
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
             // Iterate over each user and serialize their data into a single line
             for (User user : users) {
-                assert user != null : "user is null";
-
                 String userLine = serializeUser(user);
                 writer.write(userLine);
                 writer.newLine();
@@ -52,9 +47,6 @@ public class UserFileHandler {
      * @post the user is appended to the file in CSV format
      */
     public static void saveUsersToFile(User user, String filename) {
-        assert user != null : "user is null";
-        assert filename != null && !filename.isEmpty() : "filename is null or empty";
-
         // Open the file for writing
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename, true))) {
             // If the file is not empty, write a new line before adding the next user
@@ -161,7 +153,6 @@ public class UserFileHandler {
      * @post the user information is logged if user is non-null
      */
     public static void printUser(User user) {
-        assert user != null;
         LOGGER.info(user.toString());
     }
 

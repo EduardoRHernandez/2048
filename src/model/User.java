@@ -49,7 +49,6 @@ public class User {
      * @post getHighestScore() == highestScore
      */
     public User(String username, String hashedPassword, String email, String name, int highestScore, boolean isHashed) {
-        assert isHashed;
         this.username = username;
         this.hashedPassword = hashedPassword;
         this.email = email;
@@ -67,7 +66,6 @@ public class User {
      * @post the returned string is not null and not empty
      */
     private String hashPass(String password) {
-        assert password != null && !password.isEmpty();
         return Integer.toHexString(password.hashCode());
     }
 

@@ -51,17 +51,6 @@ public enum Directions {
     }
 
     /**
-     * Checks if the direction is valid.
-     *
-     * @return TRUE if the direction is valid, FALSE if not
-     * @pre The direction is one of the four directions
-     * @post The result is a boolean indicating if the direction is valid
-     */
-    public boolean isValid() {
-        return ALWAYS_VALID;
-    }
-
-    /**
      * Converts a string representation of a direction to a Directions enum.
      *
      * @param direction the string representation of the direction

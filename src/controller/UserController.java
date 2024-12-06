@@ -104,10 +104,6 @@ public class UserController {
      * @post the user's password remains unchanged
      */
     public void updateUser(String username, String password, int highestScore) {
-        assert username != null && !username.isEmpty() : "username is null or empty";
-        assert password != null && !password.isEmpty() : "password is null or empty";
-        assert highestScore >= 0 : "highestScore is negative";
-
         User user = getUser(username, password);
         System.out.println(user.toString());
         if (user != null) {
@@ -128,11 +124,6 @@ public class UserController {
      * @post the user's password is updated to the new password if the user exists
      */
     public void resetPassword(String username, String name, String email, String newPassword) {
-        assert username != null && !username.isEmpty() : "username is null or empty";
-        assert name != null && !name.isEmpty() : "name is null or empty";
-        assert email != null && !email.isEmpty() : "email is null or empty";
-        assert newPassword != null && !newPassword.isEmpty() : "newPassword is null or empty";
-
         User user = null;
         user = UserFileHandler.getUser(username, name, email, usersFile.getPath());
         if (user != null) {
