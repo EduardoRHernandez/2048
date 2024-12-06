@@ -13,7 +13,7 @@ class UserControllerTest {
     private static final String TEST_FILE = "UserDatabase.csv";
     private File testFile;
     private UserController userController;
-
+ 
     @BeforeAll
     void setup() {
         testFile = new File(TEST_FILE);
@@ -164,5 +164,63 @@ class UserControllerTest {
         assertEquals("Test User", user.getName());
         assertEquals(100, user.getHighestScore());
     }
+    
+    @Test
+    void testAddUserWithUserObject() throws IOException {
+        // Create a new User object
+        User newUser = new User("testuser", "password123", "test@example.com", "Test User", 100);
+
+        // Add the user
+        boolean isAdded = userController.addUser(newUser);
+        assertTrue(isAdded);
+
+        // Attempt to add a duplicate user by username
+        User duplicateUsernameUser = new User("testuser", "newpassword", "newemail@example.com", "Duplicate Username", 200);
+        isAdded = userController.addUser(duplicateUsernameUser);
+        assertFalse(isAdded);
+
+        // Attempt to add a duplicate user by email
+        User duplicateEmailUser = new User("newuser", "newpassword", "test@example.com", "Duplicate Email", 200);
+        isAdded = userController.addUser(duplicateEmailUser);
+        assertFalse(isAdded);
+
+        // Verify the file still contains only the original user
+        List<User> users = UserFileHandler.loadUsersFromFile(TEST_FILE);
+        assertEquals(1, users.size());
+        User user = users.get(0);
+
+        // Validate original user details
+        assertEquals("testuser", user.getUsername());
+        assertTrue(user.isPasswordCorrect("password123"));
+        assertEquals("test@example.com", user.getEmail());
+        assertEquals("Test User", user.getName());
+        assertEquals(100, user.getHighestScore());
+    }
+    
+    @Test
+    void testGetUserByUsername() throws IOException {
+        // Add a user
+        userController.addUser("testuser", "password123", "test@example.com", "Test User", 100);
+
+        // Retrieve the user by username
+        User user = userController.getUser("testuser");
+        assertNotNull(user);
+
+        // Validate user details
+        assertEquals("testuser", user.getUsername());
+        assertTrue(user.isPasswordCorrect("password123"));
+        assertEquals("test@example.com", user.getEmail());
+        assertEquals("Test User", user.getName());
+        assertEquals(100, user.getHighestScore());
+    }
+
+    @Test
+    void testGetUserByUsernameNotFound() {
+        // Attempt to retrieve a user that doesn't exist
+        User user = userController.getUser("nonexistentuser");
+        assertNull(user);
+    }
+
+
 
 }
