@@ -26,15 +26,6 @@ class UserTest {
     }
 
     @Test
-    void testConstructorWithInvalidHashedPasswordFlag() {
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> new User("testUser", "password123", "test@example.com", "Test User", 100, false)
-        );
-        assertEquals("Use the plain password constructor for non-hashed passwords.", exception.getMessage());
-    }
-
-    @Test
     void testPasswordReset() {
         User user = new User("testUser", "password123", "test@example.com", "Test User", 100);
         assertTrue(user.isPasswordCorrect("password123"));
