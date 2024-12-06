@@ -121,7 +121,7 @@ public class Board {
         for (Tile tile : aBoard.subList(rowIndex * BOARD_SIZE, (rowIndex + 1) * BOARD_SIZE)) {
             row.add(new Tile(tile));
         }
-        return row;
+        return Collections.unmodifiableList(row);
     }
 
     /**
@@ -135,7 +135,7 @@ public class Board {
         for (int i = 0; i < BOARD_SIZE; i++) {
             column.add(new Tile(aBoard.get(i * BOARD_SIZE + colIndex)));
         }
-        return column;
+        return Collections.unmodifiableList(column);
     }
 
     /**

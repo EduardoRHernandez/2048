@@ -8,7 +8,6 @@ public enum Directions {
 
     private final boolean isForward; // TRUE for UP/LEFT, FALSE for DOWN/RIGHT
     private final boolean isRow; // TRUE for horizontal movement (LEFT/RIGHT)
-    public static final boolean ALWAYS_VALID = true;
 
     /**
      * Constructs a direction with specified forward and row values.
