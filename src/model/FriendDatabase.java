@@ -85,7 +85,7 @@ public class FriendDatabase {
         assert friend != null : "Friend must be non-null";
 
         if (friends.containsKey(username)) {
-            return friends.get(username).remove(friend);
+            return friends.get(username).removeIf(f -> f.getUsername().equals(friend.getUsername()));
         } else {
             return false;
         }
