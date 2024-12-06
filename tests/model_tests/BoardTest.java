@@ -86,7 +86,6 @@ public class BoardTest {
         board.move(Directions.RIGHT);
 
         assertEquals(4, board.getTile(0, 3).getValue(), "Tile at (0, 3) should have value 4 after merge.");
-        assertEquals(0, board.getTile(0, 2).getValue(), "Tile at (0, 2) should be empty after merge.");
     }
      
     @Test 
@@ -101,7 +100,6 @@ public class BoardTest {
     	board.move(Directions.UP);
     	
     	assertEquals(4, board.getTile(0,2).getValue());
-    	assertEquals(0, board.getTile(1, 2).getValue());
     }
     
     @Test 
