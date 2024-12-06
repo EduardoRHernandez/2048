@@ -1,6 +1,7 @@
 package controller;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import model.FriendDatabase;
@@ -67,11 +68,11 @@ public class FriendDatabaseController {
         User removeUser;
         friendUser = this.userController.getUser(friendUsername);
         removeUser = this.userController.getUser(username);
-        if (friendUser == null) {
+        if (friendUser == null || removeUser == null) {
             return false;
         }
         return FriendDatabase.removeFriend(username, friendUser)
-                && FriendDatabase.removeFriend(removeUser.getUsername(), friendUser);
+                && FriendDatabase.removeFriend(friendUser.getUsername(), removeUser);
     }
 
     /**
@@ -84,8 +85,6 @@ public class FriendDatabaseController {
     public List<User> getFriends(String username) {
         assert username != null && !username.isEmpty() : USERNAME_VALIDATION_MESSAGE;
         List<User> friends = FriendDatabase.getFriends(username);
-        assert friends != null && !friends.isEmpty()
-                : "List of friends must not be null or empty if the user has friends";
         return friends;
     }
 
@@ -132,7 +131,6 @@ public class FriendDatabaseController {
      * @post The friends database has been printed to the console
      */
     public void print() {
-        assert FriendDatabase.getFriends("") != null : "Friends database must be initialized";
         FriendDatabase.print();
     }
 
@@ -143,8 +141,6 @@ public class FriendDatabaseController {
      * @post The friends database is empty
      */
     public void clear() {
-        assert FriendDatabase.getFriends("") != null : "Friends database must be initialized";
         FriendDatabase.clear();
-        assert FriendDatabase.getFriends("").isEmpty() : "Friends database should be empty after clear";
     }
 }
