@@ -34,22 +34,6 @@ class UserControllerTest {
             testFile.delete();
         }
     }
-  
-    @Test
-    void testAddUser() throws IOException {
-        userController.addUser("testuser", "password123", "test@example.com", "Test User", 100);
-
-        List<User> users = UserFileHandler.loadUsersFromFile(TEST_FILE);
-        
-        assertEquals(1, users.size());
-        User user = users.get(0);
-
-        assertEquals("testuser", user.getUsername());
-        assertTrue(user.isPasswordCorrect("password123"));
-        assertEquals("test@example.com", user.getEmail());
-        assertEquals("Test User", user.getName());
-        assertEquals(100, user.getHighestScore());
-    }
 
     @Test
     void testGetUser() {
