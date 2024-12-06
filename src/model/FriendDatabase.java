@@ -57,6 +57,7 @@ public class FriendDatabase {
     public static List<User> getFriends(String username) {
         assert username != null && !username.isEmpty() : USERNAME_VALIDATION_MESSAGE;
         if (friends.containsKey(username)) {
+            System.out.println("Friends: " + friends.get(username));
             List<User> friendList = friends.get(username).stream()
                     .map(user -> new User(user.getUsername(), user.getPassword(), user.getEmail(), user.getName(),
                             user.getHighestScore(), true))
