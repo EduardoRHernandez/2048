@@ -53,26 +53,27 @@ public class TextUI {
             }
         }
 
+        int score = boardController.getCurrentScore();
         System.out.println("Do you have an account? (y/n)");
         String response = scanner.nextLine();
         if (response.equalsIgnoreCase("y")) {
-            currentUser = signIn(scanner, userController);
+            currentUser = signIn(scanner, userController, score);
+        } else if (response.equalsIgnoreCase("n")) {
+            currentUser = signUp(scanner, userController, score);
         } else {
-            currentUser = signUp(scanner, userController);
+            System.out.println("Invalid response. Please try again.");
         }
 
         System.out.println("Your current score is: " + boardController.getCurrentScore());
-        int score = boardController.getCurrentScore();
-        if (score > currentUser.getHighestScore()) {
-            userController.updateUser(currentUser.getUsername(), currentUser.getPassword(), score);
-            System.out.println("New high score saved!");
+        if (currentUser != null) {
+            System.out.println("Your highest score is: " + currentUser.getHighestScore());
         }
 
         System.out.println("Thanks for playing 2048!");
         scanner.close();
     }
 
-    private static User signIn(Scanner scanner, UserController userController) {
+    private static User signIn(Scanner scanner, UserController userController, int score) {
         System.out.println("Enter your username: ");
         String username = scanner.nextLine();
         System.out.println("Enter your password: ");
@@ -80,11 +81,14 @@ public class TextUI {
         User currentUser = userController.getUser(username, password);
         if (currentUser == null) {
             System.out.println("Invalid username or password. Please try again.");
+        } else {
+            currentUser.setHighestScore(score);
+            userController.updateUser(username, password, score);
         }
         return currentUser;
     }
 
-    private static User signUp(Scanner scanner, UserController userController) {
+    private static User signUp(Scanner scanner, UserController userController, int score) {
         System.out.println("Enter your username: ");
         String username = scanner.nextLine();
         System.out.println("Enter your password: ");
@@ -93,7 +97,7 @@ public class TextUI {
         String email = scanner.nextLine();
         System.out.println("Enter your name: ");
         String name = scanner.nextLine();
-        boolean success = userController.addUser(username, password, email, name, 0);
+        boolean success = userController.addUser(username, password, email, name, score);
         if (!success) {
             System.out.println("Username already exists. Please try again.");
         } else {

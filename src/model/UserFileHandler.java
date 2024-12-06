@@ -96,8 +96,6 @@ public class UserFileHandler {
             String name = unescapeComma(parts[2]);
             int highestScore = Integer.parseInt(parts[3]);
             String passwordHash = parts[4]; // hashed password
-
-            // Recreate the user (pass password hash directly)
             return new User(username, passwordHash, email, name, highestScore, true);
         } catch (NumberFormatException e) {
             LOGGER.warning("Malformed data: " + Arrays.toString(parts));
@@ -186,8 +184,7 @@ public class UserFileHandler {
         List<User> users = loadUsersFromFile(filename);
         for (User user : users) {
             if (user.getUsername().equals(username) && user.isPasswordCorrect(password)) {
-                return new User(user.getUsername(), user.getPassword(), user.getEmail(), user.getName(),
-                        user.getHighestScore(), true);
+                return user;
             }
         }
         return null;

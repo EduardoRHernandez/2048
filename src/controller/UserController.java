@@ -109,9 +109,9 @@ public class UserController {
         assert highestScore >= 0 : "highestScore is negative";
 
         User user = getUser(username, password);
+        System.out.println(user.toString());
         if (user != null) {
             user.setHighestScore(highestScore);
-            user.resetPassword(password);
             UserFileHandler.deleteUser(username, usersFile.getPath());
             UserFileHandler.saveUsersToFile(user, usersFile.getPath());
         }
