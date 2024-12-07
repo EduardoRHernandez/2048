@@ -105,7 +105,6 @@ public class UserController {
      */
     public void updateUser(String username, String password, int highestScore) {
         User user = getUser(username, password);
-        System.out.println(user.toString());
         if (user != null) {
             user.setHighestScore(highestScore);
             UserFileHandler.deleteUser(username, usersFile.getPath());
