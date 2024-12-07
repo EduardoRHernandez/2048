@@ -8,6 +8,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -25,17 +26,19 @@ public class GUI extends Application {
   private Label bestScoreLabel;
   private int score;
   private int bestScore;
+  private themeGUI themeManager; // Theme manager to handle themes
 
   @Override
   public void start(Stage primaryStage) {
     // Initialize the game controller
     controller = new BoardController();
+    themeManager = new themeGUI(); // Initialize the theme manager
 
-    // Set up the game grid (initialize before using it)
+    // Set up the game grid
     grid = new GridPane();
     grid.setHgap(10);
     grid.setVgap(10);
-    grid.setPrefSize(400, 400); // Fix the size of the grid
+    grid.setPrefSize(400, 400);
     grid.setAlignment(Pos.CENTER);
 
     // Add two random tiles at the start
@@ -43,7 +46,7 @@ public class GUI extends Application {
     controller.addRandomTile();
 
     // Display the initial board
-    updateBoard(); // Ensure the grid reflects the board state immediately
+    updateBoard();
 
     // Initialize scores
     score = controller.getCurrentScore();
@@ -81,9 +84,19 @@ public class GUI extends Application {
     );
     newGameButton.setOnAction(e -> restartGame());
 
-    // Arrange score, best score, and button in a horizontal box
+    ComboBox<String> themeSelector = new ComboBox<>();
+    themeSelector.getItems().addAll(themeManager.getThemes().keySet());
+    themeSelector.setValue("Classic"); // Default theme
+    themeSelector.setFocusTraversable(false); // Prevent keyboard focus
+    themeSelector.setOnAction(event -> {
+      themeManager.setTheme(themeSelector.getValue());
+      applyTheme();
+    });
+
+    // Arrange score, best score, button, and theme selector in a horizontal box
     HBox scoreBoxContainer = new HBox(
       20,
+      themeSelector,
       scoreBox,
       bestScoreBox,
       newGameButton
@@ -104,14 +117,14 @@ public class GUI extends Application {
     root.setStyle("-fx-background-color: #faf8ef; -fx-padding: 20;");
     root.setAlignment(Pos.TOP_CENTER);
 
-    // Prevent grid stretching when fullscreen
-    VBox.setVgrow(gridWrapper, null);
-
-    updateBoard();
-
     // Create the scene
-    Scene scene = new Scene(root, 500, 600);
-    root.requestFocus(); // Ensure the root has focus for key handling
+    Scene scene = new Scene(root, 700, 750);
+
+    // Assign the scene to the stage
+    primaryStage.setScene(scene);
+
+    // Apply the theme after the scene is set
+    applyTheme();
 
     // Add key press event handler
     scene.setOnKeyPressed(event -> {
@@ -119,23 +132,38 @@ public class GUI extends Application {
 
       switch (event.getCode()) {
         case UP:
-          validMove = controller.moveUp();
+          if (
+            !event.isShiftDown() && !event.isControlDown() && !event.isAltDown()
+          ) {
+            validMove = controller.moveUp();
+          }
           break;
         case DOWN:
-          validMove = controller.moveDown();
+          if (
+            !event.isShiftDown() && !event.isControlDown() && !event.isAltDown()
+          ) {
+            validMove = controller.moveDown();
+          }
           break;
         case LEFT:
-          validMove = controller.moveLeft();
+          if (
+            !event.isShiftDown() && !event.isControlDown() && !event.isAltDown()
+          ) {
+            validMove = controller.moveLeft();
+          }
           break;
         case RIGHT:
-          validMove = controller.moveRight();
+          if (
+            !event.isShiftDown() && !event.isControlDown() && !event.isAltDown()
+          ) {
+            validMove = controller.moveRight();
+          }
           break;
         default:
           return; // Ignore other keys
       }
 
       if (validMove) {
-        controller.addRandomTile();
         updateScore();
         updateBoard();
 
@@ -149,6 +177,14 @@ public class GUI extends Application {
     primaryStage.setTitle("2048 Game");
     primaryStage.setScene(scene);
     primaryStage.show();
+
+    root.requestFocus();
+  }
+
+  private void applyTheme() {
+    // Call applyTheme from themeGUI
+    themeManager.applyTheme(grid.getScene().getRoot(), grid);
+    updateBoard(); // Ensure the board reflects the updated theme
   }
 
   private void updateBoard() {
@@ -173,45 +209,7 @@ public class GUI extends Application {
   }
 
   private String getTileStyle(int value) {
-    String backgroundColor;
-    switch (value) {
-      case 2:
-        backgroundColor = "#eee4da";
-        break;
-      case 4:
-        backgroundColor = "#ede0c8";
-        break;
-      case 8:
-        backgroundColor = "#f2b179";
-        break;
-      case 16:
-        backgroundColor = "#f59563";
-        break;
-      case 32:
-        backgroundColor = "#f67c5f";
-        break;
-      case 64:
-        backgroundColor = "#f65e3b";
-        break;
-      case 128:
-        backgroundColor = "#edcf72";
-        break;
-      case 256:
-        backgroundColor = "#edcc61";
-        break;
-      case 512:
-        backgroundColor = "#edc850";
-        break;
-      case 1024:
-        backgroundColor = "#edc53f";
-        break;
-      case 2048:
-        backgroundColor = "#edc22e";
-        break;
-      default:
-        backgroundColor = "#cdc1b4";
-    }
-
+    String backgroundColor = themeManager.getCurrentTheme().getTileColor(value);
     String fontColor = (value == 2 || value == 4) ? "#776e65" : "#f9f6f2";
     return String.format(
       "-fx-background-color: %s; -fx-border-radius: 5px; -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: %s;",

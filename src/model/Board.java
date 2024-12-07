@@ -16,6 +16,15 @@ public class Board {
         initializeBoard();
     }
 
+    public Board(Board board) {
+        this.aBoard = new ArrayList<>();
+        for (Tile tile : board.aBoard) {
+            this.aBoard.add(new Tile(tile));
+        }
+        this.currentScore = board.currentScore;
+        this.random = new Random();
+    }
+
     public Board(Random random) {
         this.random = random;
         initializeBoard();
@@ -23,18 +32,22 @@ public class Board {
 
     /**
      * Initialize the board with 4x4 empty tiles.
+     * 
+     * @post aBoard contains 16 tiles with value 0.
      */
     private void initializeBoard() {
         aBoard = new ArrayList<>();
-        // Create 4x4 tiles
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
-                // Create a new tile and add it to the board
                 aBoard.add(new Tile());
             }
         }
     }
 
+    /**
+     * @return a list of all tile values in the board.
+     * @post The returned list is unmodifiable.
+     */
     public List<Integer> getBoardValues() {
         List<Integer> boardValues = new ArrayList<>();
         for (Tile tile : aBoard) {
@@ -43,44 +56,92 @@ public class Board {
         return Collections.unmodifiableList(boardValues);
     }
 
+    /**
+     * @param x the x-coordinate of the tile
+     * @param y the y-coordinate of the tile
+     * @return the tile at the given position
+     * @pre 0 <= x < {@link #BOARD_SIZE} and 0 <= y < {@link #BOARD_SIZE}
+     * @post the returned tile is not null
+     */
     private Tile getThisTile(int x, int y) {
-        return this.aBoard.get(x * BOARD_SIZE + y);
+        return aBoard.get(x * BOARD_SIZE + y);
     }
 
+    /**
+     * @param x the x-coordinate of the tile
+     * @param y the y-coordinate of the tile
+     * @return the tile at the given position
+     * @pre 0 <= x < {@link #BOARD_SIZE} and 0 <= y < {@link #BOARD_SIZE}
+     * @post the returned tile is not null and is a copy of the tile at the given
+     *       position
+     */
     public Tile getTile(int x, int y) {
         return new Tile(aBoard.get(x * BOARD_SIZE + y));
     }
 
+    /**
+     * @param x    the x-coordinate of the tile
+     * @param y    the y-coordinate of the tile
+     * @param tile the tile to set at the given position
+     * @pre 0 <= x < {@link #BOARD_SIZE} and 0 <= y < {@link #BOARD_SIZE}
+     * @post the tile at the given position is the given tile
+     */
     public void setTile(int x, int y, Tile tile) {
         aBoard.set(x * BOARD_SIZE + y, new Tile(tile));
     }
 
+    /**
+     * @return the current score
+     * @post the returned score is the sum of all values of all tiles that have been
+     *       merged
+     */
     public int getCurrentScore() {
         return currentScore;
     }
 
+    /**
+     * Resets the merged state of all tiles on the board.
+     * 
+     * @post All tiles on the board are set to not merged.
+     */
     void resetMergedState() {
         for (Tile tile : aBoard) {
             tile.setMerged(false);
         }
     }
 
+    /**
+     * @param rowIndex the row index of the row to get
+     * @return the row at the given index
+     * @pre 0 <= rowIndex < {@link #BOARD_SIZE}
+     * @post the returned row is a copy of the row at the given index
+     */
     public List<Tile> getRow(int rowIndex) {
         List<Tile> row = new ArrayList<>();
         for (Tile tile : aBoard.subList(rowIndex * BOARD_SIZE, (rowIndex + 1) * BOARD_SIZE)) {
             row.add(new Tile(tile));
         }
-        return row;
+        return Collections.unmodifiableList(row);
     }
 
+    /**
+     * @param colIndex the column index of the column to get
+     * @return the column at the given index
+     * @pre 0 <= colIndex < {@link #BOARD_SIZE}
+     * @post the returned column is a copy of the column at the given index
+     */
     public List<Tile> getColumn(int colIndex) {
         List<Tile> column = new ArrayList<>();
         for (int i = 0; i < BOARD_SIZE; i++) {
             column.add(new Tile(aBoard.get(i * BOARD_SIZE + colIndex)));
         }
-        return column;
+        return Collections.unmodifiableList(column);
     }
 
+    /**
+     * @return a snapshot of the current board state
+     * @post the returned list is a copy of the current board state
+     */
     private List<Integer> snapshotBoard() {
         List<Integer> snapshot = new ArrayList<>();
         for (Tile tile : aBoard) {
@@ -89,6 +150,17 @@ public class Board {
         return snapshot;
     }
 
+    /**
+     * Checks if the board state has changed between two snapshots.
+     *
+     * @param before the list of tile values before changes
+     * @param after  the list of tile values after changes
+     * @return true if there is a difference between the snapshots, false otherwise
+     * @pre before.size() == after.size() : "Both snapshots must have the same
+     *      size."
+     * @post result == true if there is at least one differing element, false
+     *       otherwise
+     */
     private boolean hasBoardChanged(List<Integer> before, List<Integer> after) {
         for (int i = 0; i < before.size(); i++) {
             if (!before.get(i).equals(after.get(i))) {
@@ -98,6 +170,16 @@ public class Board {
         return false;
     }
 
+    /**
+     * Moves the board in the specified direction and adds a new random tile if
+     * the board changed.
+     *
+     * @param direction the direction to move the board
+     * @return true if the board changed, false otherwise
+     * @pre direction must be one of the four directions
+     * @post if hasBoardChanged(before, after) then addRandomTile() has been
+     *       called, else not
+     */
     public boolean move(Directions direction) {
         // Snapshot the board before the move
         List<Integer> beforeMove = snapshotBoard();
@@ -121,7 +203,12 @@ public class Board {
         List<Integer> afterMove = snapshotBoard();
 
         // Add a random tile only if the board has changed
-        return hasBoardChanged(beforeMove, afterMove);
+        if (hasBoardChanged(beforeMove, afterMove)) {
+            addRandomTile();
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private void moveLeft() {
@@ -287,6 +374,12 @@ public class Board {
     }
 
     // Helper methods for updating board values
+    /**
+     * @param newline the new values to set on the row
+     * @param row     the row to update
+     * @pre newline.length == {@link #BOARD_SIZE}
+     * @post The row at the given index has its values set to the given new values
+     */
     private void updateRowWithNewValues(int[] newline, int row) {
         for (int i = 0; i < newline.length; i++) {
             Tile tile = getThisTile(row, i);
@@ -294,6 +387,13 @@ public class Board {
         }
     }
 
+    /**
+     * @param newline the new values to set on the column
+     * @param col     the column to update
+     * @pre newline.length == {@link #BOARD_SIZE}
+     * @post The column at the given index has its values set to the given new
+     *       values
+     */
     private void updateColumnWithNewValues(int[] newline, int col) {
         for (int i = 0; i < newline.length; i++) {
             Tile tile = getThisTile(i, col);
@@ -301,7 +401,14 @@ public class Board {
         }
     }
 
-    // Extracted helper method to check merge conditions
+    /**
+     * @param currentTile the current tile to check
+     * @param nextTile    the next tile to check
+     * @return true if the two tiles should be merged, false otherwise
+     * @pre currentTile.getValue() >= 0 && nextTile.getValue() >= 0
+     * @post result == true if the two tiles have the same value and are not merged,
+     *       false otherwise
+     */
     private boolean shouldMerge(Tile currentTile, Tile nextTile) {
         return currentTile.getValue() == nextTile.getValue()
                 && !currentTile.isMerged()
@@ -309,6 +416,16 @@ public class Board {
     }
 
     // Extracted helper method to perform the merge
+    /**
+     * @param currentTile the current tile to merge
+     * @param nextTile    the next tile to merge
+     * @pre currentTile.getValue() >= 0 && nextTile.getValue() >= 0
+     * @pre shouldMerge(currentTile, nextTile)
+     * @post currentTile.getValue() == 2 * currentTile.getValue() and
+     *       currentTile.isMerged() and
+     *       nextTile.getValue() == 0 and
+     *       this.currentScore == this.currentScore + 2 * currentTile.getValue()
+     */
     private void performMerge(Tile currentTile, Tile nextTile) {
         int val = currentTile.getValue() * 2;
         currentTile.setValue(val);
@@ -317,6 +434,10 @@ public class Board {
         this.currentScore += val;
     }
 
+    /**
+     * @pre There is at least one empty tile on the board
+     * @post There is one more tile on the board with a value of 2 or 4
+     */
     public void addRandomTile() {
         ArrayList<Integer> emptyTileIndices = new ArrayList<>();
 
@@ -327,9 +448,9 @@ public class Board {
             }
         }
 
-        // If there are no empty tiles, do nothing
+        // If there are no empty tiles, throw an exception
         if (emptyTileIndices.isEmpty()) {
-            return;
+            throw new IllegalStateException("There are no empty tiles on the board");
         }
 
         // Choose a random index from the list of empty tiles
@@ -340,6 +461,12 @@ public class Board {
         aBoard.get(randomIndex).setValue(newValue);
     }
 
+    /**
+     * Checks if the game is over.
+     * 
+     * @return true if there are no more moves available, false otherwise
+     * @post result == true if the game is over, false otherwise
+     */
     public boolean isGameOver() {
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {

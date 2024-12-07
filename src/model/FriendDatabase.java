@@ -1,8 +1,16 @@
 package model;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class FriendDatabase {
 
@@ -11,6 +19,17 @@ public class FriendDatabase {
     private FriendDatabase() {
     }
 
+    /**
+     * Adds a friend to the user's friend list.
+     * 
+     * @param username the username of the user
+     * @param friend   the friend to be added
+     * @return true if the friend was successfully added, false otherwise
+     * @pre username is non-null and not empty
+     * @pre friend is non-null
+     * @post if the friend was successfully added, the user's friend list will
+     *       contain the friend
+     */
     public static boolean addFriend(String username, User friend) {
         if (!friends.containsKey(username)) {
             friends.put(username, new ArrayList<>());
@@ -18,24 +37,101 @@ public class FriendDatabase {
         if (!friends.get(username).contains(friend)) {
             friends.get(username).add(friend);
             return true;
-        } else
+        } else {
             return false;
+        }
     }
 
+    /**
+     * Gets the list of friends for the given user.
+     * 
+     * @param username the username of the user
+     * @return a list of friends for the given user
+     * @pre username is non-null and not empty
+     * @post the list of friends is not null and is not empty if the user has
+     *       friends
+     */
     public static List<User> getFriends(String username) {
-        return friends.getOrDefault(username, new ArrayList<>());
+        if (friends.containsKey(username)) {
+            List<User> friendList = friends.get(username).stream()
+                    .map(user -> new User(user.getUsername(), user.getPassword(), user.getEmail(), user.getName(),
+                            user.getHighestScore(), true))
+                    .toList();
+            return Collections.unmodifiableList(friendList);
+        } else {
+            return Collections.emptyList();
+        }
     }
 
+    /**
+     * Removes a friend from the user's friend list.
+     * 
+     * @param username the username of the user
+     * @param friend   the friend to be removed
+     * @return true if the friend was successfully removed, false otherwise
+     * @pre username is non-null and not empty
+     * @pre friend is non-null
+     * @post if the friend was successfully removed, the user's friend list will no
+     *       longer contain the friend
+     */
     public static boolean removeFriend(String username, User friend) {
         if (friends.containsKey(username)) {
-            friends.get(username).remove(friend);
-            return true;
-        } else
+            return friends.get(username).removeIf(f -> f.getUsername().equals(friend.getUsername()));
+        } else {
             return false;
+        }
     }
 
+    /**
+     * Clears all friends from the database.
+     * 
+     * @pre The friend database is initialized
+     * @post The friend database is empty
+     */
     public static void clear() {
         friends.clear();
+    }
+
+    /**
+     * @param fileName the name of the file to save friends to
+     * @pre fileName is non-null and not empty
+     * @post Friends have been saved to the specified file
+     * @throws IOException if an I/O error occurs
+     */
+    public static void saveFriends(String fileName) throws IOException {
+        PrintWriter writer = new PrintWriter(new FileWriter(fileName));
+        for (Map.Entry<String, ArrayList<User>> entry : friends.entrySet()) {
+            String line = entry.getKey() + ": "
+                    + entry.getValue().stream().map(User::getUsername).collect(Collectors.joining(", "));
+            writer.println(line); // Write each entry to the file
+        }
+        writer.close();
+    }
+
+    /**
+     * Loads friends from the specified files.
+     * 
+     * @param userFile   the file containing user data
+     * @param friendFile the file containing friend relationships
+     * @pre userFile and friendFile are non-null and not empty
+     * @post Friends have been loaded into the database from the specified files
+     */
+    public static void loadFriends(String userFile, String friendFile) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(friendFile));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            String[] parts = line.split(": ", -1); // Split by colon with all fields
+            String username = parts[0];
+            String friendsString = parts[1];
+            String[] friendsArray = friendsString.split(", ");
+            ArrayList<User> friends = new ArrayList<>();
+            for (String friend : friendsArray) {
+                User friendUser = UserFileHandler.getUser(friend, userFile);
+                friends.add(friendUser);
+            }
+            FriendDatabase.friends.put(username, friends);
+        }
+        reader.close();
     }
 
     public static void print() {

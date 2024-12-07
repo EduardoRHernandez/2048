@@ -1,54 +1,127 @@
 package controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import model.FriendDatabase;
 import model.User;
-import model.UserFileHandler;
 
 public class FriendDatabaseController {
-    public static boolean addFriend(String username, String friendUsername, String userFile) {
+
+    private UserController userController;
+
+    /**
+     * @param userController the user controller to use when adding and removing
+     *                       friends
+     * @pre userController != null
+     */
+    public FriendDatabaseController(UserController userController) {
+        this.userController = userController;
+    }
+
+    /**
+     * @param username       the username of the user who is adding the friend
+     * @param friendUsername the username of the friend being added
+     * @return true if the friend was added successfully, false if the friend could
+     *         not
+     *         be added
+     * @pre userController != null
+     * @pre username != null and not empty
+     * @pre friendUsername != null and not empty
+     */
+    public boolean addFriend(String username, String friendUsername) {
         User friendUser;
-        try {
-            friendUser = UserFileHandler.getUser(friendUsername, userFile);
-            return FriendDatabase.addFriend(username, friendUser);
-        } catch (IOException e) {
-            e.printStackTrace();
+        User adderUser;
+        friendUser = this.userController.getUser(friendUsername);
+        adderUser = this.userController.getUser(username);
+        if (friendUser == null) {
             return false;
         }
+        return FriendDatabase.addFriend(username, friendUser)
+                && FriendDatabase.addFriend(friendUser.getUsername(), adderUser);
     }
 
-    public boolean removeFriend(String username, String friendUsername, String userFile) {
+    /**
+     * @param username       the username of the user who is removing the friend
+     * @param friendUsername the username of the friend being removed
+     * @return true if the friend was removed successfully, false if the friend
+     *         could
+     *         not be removed
+     * @pre userController != null
+     * @pre username != null and not empty
+     * @pre friendUsername != null and not empty
+     */
+    public boolean removeFriend(String username, String friendUsername) {
         User friendUser;
-        try {
-            friendUser = UserFileHandler.getUser(friendUsername, userFile);
-            return FriendDatabase.removeFriend(username, friendUser);
-        } catch (IOException e) {
-            e.printStackTrace();
+        User removeUser;
+        friendUser = this.userController.getUser(friendUsername);
+        removeUser = this.userController.getUser(username);
+        if (friendUser == null || removeUser == null) {
             return false;
         }
+        return FriendDatabase.removeFriend(username, friendUser)
+                && FriendDatabase.removeFriend(friendUser.getUsername(), removeUser);
     }
 
-    public static List<User> getFriends(String username) {
-        List<User> friends = FriendDatabase.getFriends(username);
-        List<User> deepCopies = new ArrayList<>();
-        for (User friend : friends) {
-            deepCopies.add(new User(friend.getUsername(), friend.getPassword(), friend.getEmail(), friend.getName(),
-                    friend.getHighestScore(), true));
+    /**
+     * @param username the username of the user whose friends are to be retrieved
+     * @return the list of friends for the given user
+     * @pre username is non-null and not empty
+     * @post the list of friends is not null and is not empty if the user has
+     *       friends
+     */
+    public List<User> getFriends(String username) {
+        return FriendDatabase.getFriends(username);
+    }
+
+    /**
+     * Saves the friends database to the specified file.
+     * 
+     * @param friendFile the file to save the friends database to
+     * @pre friendFile is non-null and not empty
+     * @post the friends database has been saved to the specified file
+     */
+    public void saveFriends(String friendFile) {
+        try {
+            FriendDatabase.saveFriends(friendFile);
+        } catch (IOException e) {
+            System.err.println("Error saving friends: " + e.getMessage());
         }
-        return Collections.unmodifiableList(deepCopies);
-
     }
 
-    public static void print() {
+    /**
+     * Loads the friends database from the specified files.
+     * 
+     * @param userFile   the file containing user data
+     * @param friendFile the file containing friend relationships
+     * @pre userFile and friendFile are non-null and not empty
+     * @post the friends database has been loaded from the specified files
+     */
+    public void loadFriends(String userFile, String friendFile) {
+        try {
+            FriendDatabase.loadFriends(userFile, friendFile);
+        } catch (IOException e) {
+            System.err.println("Error loading friends: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Prints the friends database.
+     * 
+     * @pre The friends database is initialized
+     * @post The friends database has been printed to the console
+     */
+    public void print() {
         FriendDatabase.print();
     }
 
-    public static void clear() {
+    /**
+     * Clears the friends database.
+     * 
+     * @pre The friends database is initialized
+     * @post The friends database is empty
+     */
+    public void clear() {
         FriendDatabase.clear();
     }
-
 }
