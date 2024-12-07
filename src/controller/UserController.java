@@ -6,7 +6,7 @@ import java.util.List;
 import model.*;
 
 public class UserController {
-    File usersFile;
+    private File usersFile;
 
     public UserController(File usersFile) {
         this.usersFile = usersFile;
