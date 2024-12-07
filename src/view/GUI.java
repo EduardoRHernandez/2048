@@ -333,6 +333,7 @@ public class GUI extends Application {
       );
       if (success) {
         authHelper.showMessage("Friend added successfully!");
+        friendController.saveFriends("src/files/Friends.txt");
         updateLeaderboard(friendController, leaderboardBox); // Update the leaderboard
       } else {
         authHelper.showError("Failed to add friend. Username may not exist.");
