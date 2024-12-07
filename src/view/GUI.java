@@ -29,17 +29,15 @@ import model.User;
 public class GUI extends Application {
 
   private BoardController controller;
-  private userAuthLeaderboard authHelper;
   private User loggedInUser;
   private GridPane grid;
   private Label scoreLabel;
   private Label bestScoreLabel;
   VBox leaderboardBox;
-  private Label leaderboard;
-
   private int score;
   private int bestScore;
   private themeGUI themeManager;
+  private userAuthLeaderboard authHelper;
 
   @Override
   public void start(Stage primaryStage) {
@@ -54,7 +52,7 @@ public class GUI extends Application {
     FriendDatabaseController friendController = new FriendDatabaseController(
       new UserController(userFile)
     );
-    userAuthLeaderboard authHelper = new userAuthLeaderboard(friendController);
+    authHelper = new userAuthLeaderboard(friendController);
 
     // Authenticate user
     if (!authHelper.authenticate(0)) {
@@ -68,6 +66,11 @@ public class GUI extends Application {
     // Initialize game controller and theme manager
     controller = new BoardController();
     themeManager = new themeGUI();
+
+    primaryStage.setOnCloseRequest(event -> {
+      saveUserScore();
+      Platform.exit(); // Ensure the platform exits after saving
+    });
 
     // Set up the game grid
     grid = new GridPane();
@@ -208,16 +211,15 @@ public class GUI extends Application {
 
   private void updateLeaderboard(
     FriendDatabaseController friendController,
-    VBox leaderboardBox
+    VBox leaderboardContainer
   ) {
-    leaderboardBox.getChildren().clear(); // Clear existing leaderboard
+    leaderboardContainer.getChildren().clear(); // Clear the existing leaderboard
 
-    Label leaderboardLabel = new Label("Leaderboard");
-    leaderboardLabel.setFont(Font.font("Arial", FontWeight.BOLD, 20));
-    leaderboardLabel.setStyle("-fx-text-fill: #f9f6f2;");
-    leaderboardBox.getChildren().add(leaderboardLabel);
+    Label header = new Label("Leaderboard");
+    header.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+    header.setStyle("-fx-text-fill: #f9f6f2;");
+    leaderboardContainer.getChildren().add(header);
 
-    // Fetch and display friends
     List<User> friends = friendController.getFriends(
       loggedInUser.getUsername()
     );
@@ -225,7 +227,7 @@ public class GUI extends Application {
       Label noFriendsLabel = new Label("No friends or scores to display.");
       noFriendsLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 16));
       noFriendsLabel.setStyle("-fx-text-fill: #f9f6f2;");
-      leaderboardBox.getChildren().add(noFriendsLabel);
+      leaderboardContainer.getChildren().add(noFriendsLabel);
     } else {
       for (User friend : friends) {
         Label friendLabel = new Label(
@@ -233,9 +235,13 @@ public class GUI extends Application {
         );
         friendLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 16));
         friendLabel.setStyle("-fx-text-fill: #f9f6f2;");
-        leaderboardBox.getChildren().add(friendLabel);
+        leaderboardContainer.getChildren().add(friendLabel);
       }
     }
+
+    // Dynamically adjust the height of the leaderboard based on the number of items
+    int itemCount = leaderboardContainer.getChildren().size(); // Count children (header + items)
+    leaderboardContainer.setPrefHeight(itemCount * 30); // Adjust height dynamically (30px per item)
   }
 
   /*************  ✨ Codeium Command ⭐  *************/
@@ -397,6 +403,28 @@ public class GUI extends Application {
     controller.addRandomTile();
     updateBoard(); // Refresh the board
     grid.getScene().getRoot().requestFocus(); // Ensure the root has focus for key handling
+  }
+
+  private void saveUserScore() {
+    if (loggedInUser != null && controller != null) {
+      int finalScore = controller.getCurrentScore();
+
+      // Update the highest score if the final score is greater
+      if (finalScore > loggedInUser.getHighestScore()) {
+        loggedInUser.setHighestScore(finalScore);
+
+        // Use the UserController to update the database
+        UserController userController = new UserController(
+          new File("src/files/UserDatabase.csv")
+        );
+        userController.updateUser(
+          loggedInUser.getUsername(),
+          authHelper.sendPassword(),
+          finalScore
+        );
+        System.out.println("Score saved successfully!");
+      }
+    }
   }
 
   public static void main(String[] args) {

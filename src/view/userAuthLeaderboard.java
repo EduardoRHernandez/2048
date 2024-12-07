@@ -14,6 +14,7 @@ public class userAuthLeaderboard {
   private UserController userController;
   private FriendDatabaseController friendController;
   private User loggedInUser;
+  private String password;
 
   private File usersFile;
 
@@ -22,6 +23,7 @@ public class userAuthLeaderboard {
     this.usersFile = new File("src/files/UserDatabase.csv");
     this.friendController = friendController;
     this.userController = new UserController(usersFile);
+    this.password = "\0";
   }
 
   public boolean authenticate(int score) {
@@ -66,7 +68,7 @@ public class userAuthLeaderboard {
 
       if (passwordInput.isPresent()) {
         String username = usernameInput.get();
-        String password = passwordInput.get();
+        this.password = passwordInput.get();
         User currentUser = userController.getUser(username, password);
 
         if (currentUser == null) {
@@ -112,7 +114,7 @@ public class userAuthLeaderboard {
 
           if (nameInput.isPresent()) {
             String username = usernameInput.get();
-            String password = passwordInput.get();
+            this.password = passwordInput.get();
             String email = emailInput.get();
             String name = nameInput.get();
 
@@ -173,5 +175,9 @@ public class userAuthLeaderboard {
   public void showError(String message) {
     Alert alert = new Alert(Alert.AlertType.ERROR, message, ButtonType.OK);
     alert.showAndWait();
+  }
+
+  public String sendPassword() {
+    return password;
   }
 }
