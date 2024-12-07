@@ -5,7 +5,7 @@ import model.*;
 
 public class BoardController {
 
-  Board board;
+  private Board board;
 
   public BoardController() {
     board = new Board();
