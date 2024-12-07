@@ -6,20 +6,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
 import controller.BoardController;
-import controller.FriendDatabaseController;
 import controller.UserController;
-import model.Board;
-import java.io.File;
-import java.util.Scanner;
 import model.User;
 
 public class TextUI {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         File usersFile = new File("src/files/UserDatabase.csv");
-        File friendsFile = new File("src/files/FriendsDatabase.txt");
         UserController userController = new UserController(usersFile);
-        FriendDatabaseController friendController = new FriendDatabaseController(userController);
         System.out.println("Welcome to 2048!");
 
         mainMenu(userController, scanner);
@@ -76,6 +70,7 @@ public class TextUI {
                     if (boardController.getCurrentScore() > currentUser.getHighestScore()) {
                         userController.updateUser(currentUser.getUsername(), password, boardController.getCurrentScore());
                     }
+                    currentUser = userController.getUser(currentUser.getUsername(), password);
                     System.out.println("Your highest score is: " + currentUser.getHighestScore() + "\n");
                 }
                 playing = false;
